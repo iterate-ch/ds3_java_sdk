@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>ch.iterate.spectralogic</groupId>
     <artifactId>ds3-parent</artifactId>
-    <version>1.2.7-SNAPSHOT</version>
+    <version>1.2.7</version>
     <packaging>pom</packaging>
     <prerequisites>
         <maven>3.0</maven>
@@ -33,7 +32,7 @@
         <url>https://github.com/iterate-ch/ds3_java_sdk</url>
         <connection>https://github.com/iterate-ch/ds3_java_sdk</connection>
         <developerConnection>scm:git:git@github.com:iterate-ch/ds3_java_sdk.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>ds3-parent-1.2.7</tag>
     </scm>
     <modules>
         <module>ds3-sdk</module>
