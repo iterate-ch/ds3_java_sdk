@@ -35,8 +35,6 @@ import org.slf4j.LoggerFactory;
 public class XmlOutput {
     private static final JacksonXmlModule module;
     private static final XmlMapper mapper;
-    static private final Logger LOG = LoggerFactory.getLogger(XmlOutput.class);
-    public static final String PRODUCTION_BUILD = "productionBuild";
 
     static {
         module = new JacksonXmlModule();
@@ -44,41 +42,7 @@ public class XmlOutput {
         mapper = new XmlMapper(module);
         final SimpleFilterProvider filterProvider = new SimpleFilterProvider().setFailOnUnknownId(false);
         mapper.setFilterProvider(filterProvider);
-        if (isProductionBuild()) {
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        } else {
-            LOG.info("Non-production build: Asserting on de-serializing unknown elements and attributes in XML response payloads.");
-        }
-    }
-
-    protected static boolean isProductionBuild() {
-        String productionBuild = System.getenv(PRODUCTION_BUILD);
-        if (productionBuild != null) {
-            return productionBuild.equals("true");
-        }
-
-        final Properties props = new Properties();
-        final InputStream input = XmlOutput.class.getClassLoader().getResourceAsStream("ds3_sdk.properties");
-        if (input == null) {
-            LOG.error("Could not find property file.");
-        }
-        else {
-            try {
-                props.load(input);
-                productionBuild = (String) props.get(PRODUCTION_BUILD);
-                if (productionBuild != null && productionBuild.equals("true")) {
-                    return true;
-                }
-                else {
-                    LOG.error("Unknown productionBuild value[" + productionBuild + "].  Defaulting to false for unknown XML elements.");
-                }
-            } catch (final IOException e) {
-                LOG.error("Failed to load property file: ", e);
-            }
-        }
-
-        return false;
-
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     public static String toXml(final Object object) {
