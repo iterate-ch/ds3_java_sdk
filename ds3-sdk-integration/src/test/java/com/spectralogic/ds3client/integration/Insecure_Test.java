@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -25,7 +25,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.security.SignatureException;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -34,23 +35,21 @@ import static org.junit.Assert.assertThat;
  *
  */
 public class Insecure_Test {
-
     private static Ds3Client client;
 
     @BeforeClass
-    public static void startup() {
+    public static void startup() throws IOException, SignatureException {
         client = Util.insecureFromEnv();
     }
 
     @AfterClass
-    public static void teardown() throws IOException {
+    public static void teardown() throws IOException, SignatureException {
         client.close();
     }
 
     @Test
     public void getService() throws SignatureException, IOException{
         final GetServiceResponse response = client.getService(new GetServiceRequest());
-
         assertThat(response, is(notNullValue()));
     }
 }

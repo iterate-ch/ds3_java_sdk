@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -15,17 +15,20 @@
 
 package com.spectralogic.ds3client;
 
-import com.spectralogic.ds3client.models.Credentials;
-import com.spectralogic.ds3client.models.bulk.Node;
+import com.spectralogic.ds3client.models.common.Credentials;
+import com.spectralogic.ds3client.models.JobNode;
 import com.spectralogic.ds3client.networking.ConnectionDetails;
+import com.spectralogic.ds3client.utils.Guard;
+import com.spectralogic.ds3client.utils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
-import java.sql.Connection;
 
 class ConnectionDetailsImpl implements ConnectionDetails {
     static private final Logger LOG = LoggerFactory.getLogger(ConnectionDetailsImpl.class);
+
+    private static final String DEFAULT_USER_AGENT_HEADER_VALUE = "ds3_java_sdk";
 
     static class Builder implements com.spectralogic.ds3client.utils.Builder<ConnectionDetailsImpl> {
 
@@ -34,8 +37,11 @@ class ConnectionDetailsImpl implements ConnectionDetails {
         private boolean https = false;
         private URI proxy = null;
         private int retries = 5;
-        private int bufferSize = 1024 * 1024;
+        private int bufferSizeInBytes = 1024 * 1024;
+        private int connectionTimeoutInMillis = 5 * 1000;
+        private int socketTimeoutInMillis = 60 * 60 * 1000;
         private boolean certificateVerification;
+        private String userAgent;
 
         private Builder(final String endpoint, final Credentials credentials) {
             this.endpoint = endpoint;
@@ -57,8 +63,13 @@ class ConnectionDetailsImpl implements ConnectionDetails {
             return this;
         }
 
-        public Builder withBufferSize(final int bufferSize) {
-            this.bufferSize = bufferSize;
+        public Builder withBufferSize(final int bufferSizeInBytes) {
+            this.bufferSizeInBytes = bufferSizeInBytes;
+            return this;
+        }
+
+        public Builder withConnectionTimeout(final int connectionTimeoutInMillis) {
+            this.connectionTimeoutInMillis = connectionTimeoutInMillis;
             return this;
         }
 
@@ -67,35 +78,47 @@ class ConnectionDetailsImpl implements ConnectionDetails {
             return this;
         }
 
+        public Builder withSocketTimeout(final int socketTimeoutInMillis) {
+            this.socketTimeoutInMillis = socketTimeoutInMillis;
+            return this;
+        }
+
+        public Builder withUserAgent(final String userAgent) {
+            this.userAgent = userAgent;
+            return this;
+        }
+
         @Override
         public ConnectionDetailsImpl build() {
             return new ConnectionDetailsImpl(this);
         }
-
     }
 
-    public static ConnectionDetails newForNode(final Node node, final ConnectionDetails connectionDetails) {
+    public static ConnectionDetails newForNode(final JobNode node, final ConnectionDetails connectionDetails) {
         final Builder connectionBuilder;
-        if (node.getEndpoint() == null || node.getEndpoint().equals("FAILED_TO_DETERMINE_DATAPATH_IP_ADDRESS")) {
+        if (node.getEndPoint() == null || node.getEndPoint().equals("FAILED_TO_DETERMINE_DATAPATH_IP_ADDRESS")) {
             LOG.trace("Running against an old version of the DS3 API, reusing existing endpoint configuration");
             connectionBuilder = builder(connectionDetails.getEndpoint(), connectionDetails.getCredentials());
         }
         else {
-            LOG.trace("Creating new Connection Details for endpoint: " + node.getEndpoint());
+            LOG.trace("Creating new Connection Details for endpoint: {}", node.getEndPoint());
             connectionBuilder = builder(buildAuthority(node, connectionDetails), connectionDetails.getCredentials());
         }
         connectionBuilder.withRedirectRetries(connectionDetails.getRetries())
             .withHttps(connectionDetails.isHttps())
             .withCertificateVerification(connectionDetails.isCertificateVerification())
             .withBufferSize(connectionDetails.getBufferSize())
-            .withProxy(connectionDetails.getProxy());
+            .withConnectionTimeout(connectionDetails.getConnectionTimeout())
+            .withSocketTimeout(connectionDetails.getSocketTimeout())
+            .withProxy(connectionDetails.getProxy())
+            .withUserAgent(connectionDetails.getUserAgent());
 
         return connectionBuilder.build();
     }
 
-    private static String buildAuthority(final Node node, final ConnectionDetails connectionDetails) {
-        return node.getEndpoint() + ":" + Integer.toString(
-                (connectionDetails.isHttps() ? node.getHttpsPort() : node.getHttpPort()));
+    private static String buildAuthority(final JobNode node, final ConnectionDetails connectionDetails) {
+        return node.getEndPoint() + ":" + Integer.toString(
+                connectionDetails.isHttps() ? node.getHttpsPort() : node.getHttpPort());
     }
 
     private final String endpoint;
@@ -103,8 +126,11 @@ class ConnectionDetailsImpl implements ConnectionDetails {
     private final boolean https;
     private final URI proxy;
     private final int retries;
-    private final int bufferSize;
+    private final int bufferSizeInBytes;
+    private final int connectionTimeoutInMillis;
+    private final int socketTimeoutInMillis;
     private final boolean certificateVerification;
+    private final String userAgent;
 
     static Builder builder(final String uriEndpoint, final Credentials credentials) {
         return new Builder(uriEndpoint, credentials);
@@ -116,8 +142,11 @@ class ConnectionDetailsImpl implements ConnectionDetails {
         this.https = builder.https;
         this.proxy = builder.proxy;
         this.retries = builder.retries;
-        this.bufferSize = builder.bufferSize;
+        this.bufferSizeInBytes = builder.bufferSizeInBytes;
+        this.connectionTimeoutInMillis = builder.connectionTimeoutInMillis;
         this.certificateVerification = builder.certificateVerification;
+        this.socketTimeoutInMillis = builder.socketTimeoutInMillis;
+        this.userAgent = builder.userAgent;
     }
 
     @Override
@@ -147,12 +176,37 @@ class ConnectionDetailsImpl implements ConnectionDetails {
 
     @Override
     public int getBufferSize() {
-        return bufferSize;
+        return bufferSizeInBytes;
+    }
+
+    @Override
+    public int getConnectionTimeout() {
+        return connectionTimeoutInMillis;
+    }
+
+    @Override
+    public int getSocketTimeout() {
+        return socketTimeoutInMillis;
     }
 
     @Override
     public boolean isCertificateVerification() {
         return certificateVerification;
+    }
+
+    @Override
+    public String getUserAgent() {
+        return Guard.isStringNullOrEmpty(userAgent) ? getDefaultSdkVersion() : userAgent;
+    }
+
+    private String getDefaultSdkVersion() {
+        final String sdkVersion = PropertyUtils.getSdkVersion();
+
+        if (Guard.isStringNullOrEmpty(sdkVersion)) {
+            return DEFAULT_USER_AGENT_HEADER_VALUE;
+        }
+
+        return DEFAULT_USER_AGENT_HEADER_VALUE + "-" + sdkVersion;
     }
 
     public String toString() {

@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -13,32 +13,39 @@
  * ****************************************************************************
  */
 
+// This code is auto-generated, do not modify
 package com.spectralogic.ds3client.commands;
 
-import com.spectralogic.ds3client.HttpVerb;
+import com.spectralogic.ds3client.networking.HttpVerb;
+import com.spectralogic.ds3client.commands.interfaces.AbstractRequest;
 
-/**
- * {@code HeadBucketRequest} is used to return back information on if a bucket exists, or if a user has access to that bucket.
- */
 public class HeadBucketRequest extends AbstractRequest {
 
+    // Variables
+    
     private final String bucketName;
 
+    // Constructor
+    
+    
     public HeadBucketRequest(final String bucketName) {
         this.bucketName = bucketName;
+        
     }
-    
-    public String getBucketName() {
-        return this.bucketName;
+
+
+    @Override
+    public HttpVerb getVerb() {
+        return HttpVerb.HEAD;
     }
 
     @Override
     public String getPath() {
         return "/" + this.bucketName;
     }
-
-    @Override
-    public HttpVerb getVerb() {
-        return HttpVerb.HEAD;
+    
+    public String getBucketName() {
+        return this.bucketName;
     }
+
 }

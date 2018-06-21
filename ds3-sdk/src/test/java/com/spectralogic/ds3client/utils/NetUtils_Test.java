@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -17,10 +17,13 @@ package com.spectralogic.ds3client.utils;
 
 import com.spectralogic.ds3client.BulkCommand;
 import com.spectralogic.ds3client.ConnectionFixture;
+import com.spectralogic.ds3client.models.common.Credentials;
+import com.spectralogic.ds3client.networking.ConnectionDetails;
 import com.spectralogic.ds3client.networking.NetUtils;
 import org.junit.Test;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -72,6 +75,24 @@ public class NetUtils_Test {
     public void pathMultipleSlashes() {
         final String result = NetUtils.buildPath("/basePath/", "/file.xml");
         assertThat(result, is("/basePath/file.xml"));
+    }
+
+    @Test
+    public void pathEscapeQuestion() throws MalformedURLException {
+        final URL result = NetUtils.buildUrl(ConnectionFixture.getConnection(), "bucket/One?Two.xml");
+        assertThat(result.getPath(), is("/bucket/One%3FTwo.xml"));
+    }
+
+    @Test
+    public void pathEscapeSemicolon() throws MalformedURLException {
+        final URL result = NetUtils.buildUrl(ConnectionFixture.getConnection(), "bucket/One;Two.xml");
+        assertThat(result.getPath(), is("/bucket/One%3BTwo.xml"));
+    }
+
+    @Test
+    public void pathEscapePercent() throws MalformedURLException {
+        final URL result = NetUtils.buildUrl(ConnectionFixture.getConnection(), "bucket/One%Two.xml");
+        assertThat(result.getPath(), is("/bucket/One%25Two.xml"));
     }
 
     @Test
@@ -146,21 +167,85 @@ public class NetUtils_Test {
     @Test
     public void getPortBack() throws MalformedURLException {
         final URL url = new URL("http://localhost:8080/path");
-        int port = NetUtils.getPort(url);
+        final int port = NetUtils.getPort(url);
         assertTrue(port == 8080);
     }
 
     @Test
     public void getHttpsDefaultPort() throws MalformedURLException {
         final URL url = new URL("https://localhost/path");
-        int port = NetUtils.getPort(url);
+        final int port = NetUtils.getPort(url);
         assertTrue(port == 443);
     }
 
     @Test
     public void getHttpDefaultPort() throws MalformedURLException {
         final URL url = new URL("http://localhost/path");
-        int port = NetUtils.getPort(url);
+        final int port = NetUtils.getPort(url);
         assertTrue(port == 80);
+    }
+
+    @Test
+    public void buildHostFieldWithHttp() {
+        final String result = NetUtils.buildHostField(ConnectionFixture.getHttpConnection());
+        assertThat(result, is("localhost:8080"));
+    }
+
+    @Test
+    public void buildHost() throws MalformedURLException {
+        final ConnectionDetails details = new ConnectionDetails() {
+            @Override
+            public String getEndpoint() {
+                return "http://endpoint";
+            }
+
+            @Override
+            public Credentials getCredentials() {
+                return new Credentials("accessId", "secretKey");
+            }
+
+            @Override
+            public boolean isHttps() {
+                return false;
+            }
+
+            @Override
+            public URI getProxy() {
+                return null;
+            }
+
+            @Override
+            public int getRetries() {
+                return 0;
+            }
+
+            @Override
+            public int getBufferSize() {
+                return 0;
+            }
+
+            @Override
+            public int getConnectionTimeout() {
+                return 0;
+            }
+
+            @Override
+            public int getSocketTimeout() {
+                return 0;
+            }
+
+            @Override
+            public boolean isCertificateVerification() {
+                return false;
+            }
+
+            @Override
+            public String getUserAgent() {
+                return null;
+            }
+        };
+
+        final URL url = NetUtils.buildUrl(details, "/path");
+        assertThat(url.toString(), is("http://endpoint/path"));
     }
 }

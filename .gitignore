@@ -1,4 +1,5 @@
 .gradle/
+.gradletasknamecache
 .idea/
 out/
 coverage-report/
@@ -17,3 +18,4 @@ atlassian-ide-plugin.xml
 bin/
 *.log
 *.rc
+.DS_Store

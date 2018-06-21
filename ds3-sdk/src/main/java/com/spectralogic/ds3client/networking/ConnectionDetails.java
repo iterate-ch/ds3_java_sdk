@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -15,7 +15,7 @@
 
 package com.spectralogic.ds3client.networking;
 
-import com.spectralogic.ds3client.models.Credentials;
+import com.spectralogic.ds3client.models.common.Credentials;
 
 import java.net.URI;
 
@@ -35,9 +35,15 @@ public interface ConnectionDetails {
 
     int getBufferSize();
 
+    int getConnectionTimeout();
+
+    int getSocketTimeout();
+
     /**
      * Returns true if the network layer should perform certificate authentication for SSL.  False will disable
      * certificate authentication.
      */
     boolean isCertificateVerification();
+
+    String getUserAgent();
 }

@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -16,9 +16,9 @@
 package com.spectralogic.ds3client.helpers;
 
 
-import com.spectralogic.ds3client.models.Checksum;
-import com.spectralogic.ds3client.models.bulk.BulkObject;
+import com.spectralogic.ds3client.models.BulkObject;
+import com.spectralogic.ds3client.models.ChecksumType;
 
 public interface ChecksumListener {
-    void value(final BulkObject obj, final Checksum.Type type, final String checksum);
+    void value(final BulkObject obj, final ChecksumType.Type type, final String checksum);
 }

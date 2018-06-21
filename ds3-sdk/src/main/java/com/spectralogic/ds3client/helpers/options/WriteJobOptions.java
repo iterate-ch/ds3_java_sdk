@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -15,21 +15,27 @@
 
 package com.spectralogic.ds3client.helpers.options;
 
-import com.spectralogic.ds3client.models.Checksum;
-import com.spectralogic.ds3client.models.bulk.Priority;
-import com.spectralogic.ds3client.models.bulk.WriteOptimization;
+import com.spectralogic.ds3client.models.Priority;
+import com.spectralogic.ds3client.models.ChecksumType;
+import com.spectralogic.ds3client.models.WriteOptimization;
 
 public class WriteJobOptions {
     private Priority priority;
     private WriteOptimization writeOptimization;
     private int maxUploadSize;
-    private Checksum.Type checksumType;
+    private ChecksumType.Type checksumType;
+    private boolean aggregating;
+    private boolean ignoreNamingConflicts;
+    private boolean force;
 
     private WriteJobOptions() {
         this.priority = null;
         this.writeOptimization = null;
         this.maxUploadSize = 0;
-        this.checksumType = Checksum.Type.NONE;
+        this.checksumType = ChecksumType.Type.NONE;
+        this.aggregating = false;
+        this.ignoreNamingConflicts = false;
+        this.force = false;
     }
 
     public static WriteJobOptions create() {
@@ -41,7 +47,7 @@ public class WriteJobOptions {
         return this;
     }
 
-    public int getMaxUploadSize() {
+    public long getMaxUploadSize() {
         return this.maxUploadSize;
     }
 
@@ -71,16 +77,50 @@ public class WriteJobOptions {
         this.priority = priority;
     }
 
-    public WriteJobOptions withChecksumType(final Checksum.Type checksumType) {
+    public WriteJobOptions withChecksumType(final ChecksumType.Type checksumType) {
         this.checksumType = checksumType;
         return this;
     }
 
-    public Checksum.Type getChecksumType() {
+    public ChecksumType.Type getChecksumType() {
         return checksumType;
     }
 
-    public void setChecksumType(final Checksum.Type checksumType) {
+    public void setChecksumType(final ChecksumType.Type checksumType) {
         this.checksumType = checksumType;
+    }
+
+    public WriteJobOptions withAggregating() {
+        this.aggregating = true;
+        return this;
+    }
+
+    public boolean isAggregating() {
+        return aggregating;
+    }
+
+    public void setAggregating(final boolean aggregating) {
+        this.aggregating = aggregating;
+    }
+
+    public void setIgnoreNamingConflicts(final boolean ignore) {
+        this.ignoreNamingConflicts = ignore;
+    }
+
+    public boolean doIgnoreNamingConflicts() {
+        return ignoreNamingConflicts;
+    }
+
+    public WriteJobOptions withIgnoreNamingConflicts(final boolean ignore) {
+        this.ignoreNamingConflicts = ignore;
+        return this;
+    }
+
+    public boolean isForce() {
+        return force;
+    }
+
+    public void setForce(final boolean force) {
+        this.force = force;
     }
 }

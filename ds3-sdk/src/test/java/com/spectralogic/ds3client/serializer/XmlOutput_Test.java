@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -16,13 +16,14 @@
 package com.spectralogic.ds3client.serializer;
 
 import com.google.common.collect.ImmutableList;
-import com.spectralogic.ds3client.BulkCommand;
-import com.spectralogic.ds3client.models.ListBucketResult;
-import com.spectralogic.ds3client.models.bulk.*;
+import com.spectralogic.ds3client.models.*;
+import com.spectralogic.ds3client.models.bulk.Ds3Object;
+import com.spectralogic.ds3client.models.bulk.Ds3ObjectList;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -48,14 +49,18 @@ public class XmlOutput_Test {
 
     @Test
     public void bucketList() throws IOException {
-        final String xmlResponse = "<ListBucketResult xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\"><Name>remoteTest16</Name><Prefix/><Marker/><MaxKeys>1000</MaxKeys><IsTruncated>false</IsTruncated><Contents><Key>user/hduser/gutenberg/20417.txt.utf-8</Key><LastModified>2014-01-03T13:26:47.000Z</LastModified><ETag>NOTRETURNED</ETag><Size>674570</Size><StorageClass>STANDARD</StorageClass><Owner><ID>ryan</ID><DisplayName>ryan</DisplayName></Owner></Contents><Contents><Key>user/hduser/gutenberg/5000.txt.utf-8</Key><LastModified>2014-01-03T13:26:47.000Z</LastModified><ETag>NOTRETURNED</ETag><Size>1423803</Size><StorageClass>STANDARD</StorageClass><Owner><ID>ryan</ID><DisplayName>ryan</DisplayName></Owner></Contents><Contents><Key>user/hduser/gutenberg/4300.txt.utf-8</Key><LastModified>2014-01-03T13:26:47.000Z</LastModified><ETag>NOTRETURNED</ETag><Size>1573150</Size><StorageClass>STANDARD</StorageClass><Owner><ID>ryan</ID><DisplayName>ryan</DisplayName></Owner></Contents></ListBucketResult>";
+        final UUID id = UUID.randomUUID();
+        final String xmlResponse = "<ListBucketResult xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\"><Name>remoteTest16</Name><Prefix/><Marker/><MaxKeys>1000</MaxKeys><IsTruncated>false</IsTruncated><Contents><Key>user/hduser/gutenberg/20417.txt.utf-8</Key><LastModified>2014-01-03T13:26:47.000Z</LastModified><ETag>NOTRETURNED</ETag><Size>674570</Size><StorageClass>STANDARD</StorageClass><Owner>" +
+                "<ID>" + id.toString() + "</ID><DisplayName>ryan</DisplayName></Owner></Contents><Contents><Key>user/hduser/gutenberg/5000.txt.utf-8</Key><LastModified>2014-01-03T13:26:47.000Z</LastModified><ETag>NOTRETURNED</ETag><Size>1423803</Size><StorageClass>STANDARD</StorageClass><Owner>" +
+                "<ID>" + id.toString() + "</ID><DisplayName>ryan</DisplayName></Owner></Contents><Contents><Key>user/hduser/gutenberg/4300.txt.utf-8</Key><LastModified>2014-01-03T13:26:47.000Z</LastModified><ETag>NOTRETURNED</ETag><Size>1573150</Size><StorageClass>STANDARD</StorageClass><Owner>" +
+                "<ID>" + id.toString() + "</ID><DisplayName>ryan</DisplayName></Owner></Contents></ListBucketResult>";
 
         final ListBucketResult result = XmlOutput.fromXml(xmlResponse, ListBucketResult.class);
         assertThat(result, is(notNullValue()));
         assertThat(result.getName(), is("remoteTest16"));
-        assertThat(result.getContentsList(), is(notNullValue()));
-        assertThat(result.getContentsList().size(), is(3));
-        assertThat(result.getContentsList().get(0).getSize(), is(674570L));
+        assertThat(result.getObjects(), is(notNullValue()));
+        assertThat(result.getObjects().size(), is(3));
+        assertThat(result.getObjects().get(0).getSize(), is(674570L));
     }
 
     @Test
@@ -64,11 +69,11 @@ public class XmlOutput_Test {
 
         final ListBucketResult result = XmlOutput.fromXml(xmlResponse, ListBucketResult.class);
         assertThat(result, is(notNullValue()));
-        assertThat(result.getContentsList(), is(notNullValue()));
+        assertThat(result.getObjects(), is(notNullValue()));
     }
 
     @Test
-    public void toXmlWithNoFilter() throws XmlProcessingException {
+    public void toXmlWithNoFilter() {
         final String expectedString = "<Objects><Object Name=\"file1\" Size=\"12\"/><Object Name=\"file2\" Size=\"5022\"/></Objects>";
         final List<Ds3Object> objectList = ImmutableList.of(new Ds3Object("file1", 12), new Ds3Object("file2", 5022)).asList();
         final Ds3ObjectList ds3ObjectList = new Ds3ObjectList(objectList);
@@ -78,7 +83,7 @@ public class XmlOutput_Test {
     }
 
     @Test
-    public void toXmlWithFilter() throws XmlProcessingException {
+    public void toXmlWithFilter() {
         final String expectedString = "<Objects><Object Name=\"file1\"/><Object Name=\"file2\"/></Objects>";
         final List<Ds3Object> objectList = ImmutableList.of(new Ds3Object("file1", 12), new Ds3Object("file2", 5022)).asList();
         final Ds3ObjectList ds3ObjectList = new Ds3ObjectList(objectList);
@@ -88,7 +93,7 @@ public class XmlOutput_Test {
     }
 
     @Test
-    public void toXmlWithPriority() throws XmlProcessingException {
+    public void toXmlWithPriority() {
         final String expectedString = "<Objects Priority=\"HIGH\"><Object Name=\"file1\" Size=\"12\"/><Object Name=\"file2\" Size=\"5022\"/></Objects>";
         final List<Ds3Object> objectList = ImmutableList.of(new Ds3Object("file1", 12), new Ds3Object("file2", 5022)).asList();
         final Ds3ObjectList ds3ObjectList = new Ds3ObjectList(objectList);
@@ -101,6 +106,6 @@ public class XmlOutput_Test {
     @Test
     public void fromXmlWithInvalidElementIgnoredInProductionBuild() throws IOException {
         final String xmlResponse = "<Object Name=\"file1\" InCache=\"false\" Length=\"256\" Offset=\"0\" TheAnswerToEverything=\"42\" />";
-        XmlOutput.fromXml(xmlResponse, BulkObject.class);
+        XmlOutput.fromXml(xmlResponse, com.spectralogic.ds3client.models.BulkObject.class);
     }
 }

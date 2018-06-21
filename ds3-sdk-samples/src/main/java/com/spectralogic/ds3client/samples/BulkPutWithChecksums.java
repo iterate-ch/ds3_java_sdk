@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -21,18 +21,16 @@ import com.spectralogic.ds3client.helpers.ChecksumListener;
 import com.spectralogic.ds3client.helpers.Ds3ClientHelpers;
 import com.spectralogic.ds3client.helpers.FileObjectPutter;
 import com.spectralogic.ds3client.helpers.options.WriteJobOptions;
-import com.spectralogic.ds3client.models.Checksum;
-import com.spectralogic.ds3client.models.bulk.BulkObject;
+import com.spectralogic.ds3client.models.BulkObject;
+import com.spectralogic.ds3client.models.ChecksumType;
 import com.spectralogic.ds3client.models.bulk.Ds3Object;
-import com.spectralogic.ds3client.serializer.XmlProcessingException;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.SignatureException;
 
 public class BulkPutWithChecksums {
-    public static void main(final String[] args) throws IOException, SignatureException, XmlProcessingException {
+    public static void main(final String[] args) throws IOException {
         try (final Ds3Client client = Ds3ClientBuilder.fromEnv().withHttps(false).build()) {
 
             // Wrap the Ds3Client with the helper functions
@@ -55,7 +53,7 @@ public class BulkPutWithChecksums {
             // helper functions, the helper functions must process the file twice.  Once
             // to calculate the checksum, and then once to send the object to the
             // Spectra S3 endpoint.
-            final WriteJobOptions options = WriteJobOptions.create().withChecksumType(Checksum.Type.MD5);
+            final WriteJobOptions options = WriteJobOptions.create().withChecksumType(ChecksumType.Type.MD5);
 
             // Create the write job with the bucket we want to write to and the list
             // of objects that will be written
@@ -66,7 +64,7 @@ public class BulkPutWithChecksums {
             // blob checksums
             job.attachChecksumListener(new ChecksumListener() {
                 @Override
-                public void value(final BulkObject obj, final Checksum.Type type, final String checksum) {
+                public void value(final BulkObject obj, final ChecksumType.Type type, final String checksum) {
                     // The checksum for each blob(BulkObject) is reported
                     System.out.println("The checksum for blob " + obj.toString() + " is " + checksum);
                 }

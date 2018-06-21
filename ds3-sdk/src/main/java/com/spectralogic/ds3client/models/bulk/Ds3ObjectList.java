@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -18,13 +18,18 @@ package com.spectralogic.ds3client.models.bulk;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.spectralogic.ds3client.models.Priority;
+import com.spectralogic.ds3client.models.JobChunkClientProcessingOrderGuarantee;
+import com.spectralogic.ds3client.models.WriteOptimization;
+import com.spectralogic.ds3client.utils.collections.StreamWrapper;
 
-import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @JacksonXmlRootElement(localName = "Objects")
 public class Ds3ObjectList {
     @JsonProperty("Object")
-    private List<Ds3Object> objects;
+    private Stream<Ds3Object> objects;
 
     @JacksonXmlProperty(isAttribute = true, namespace = "", localName = "Priority")
     private Priority priority;
@@ -33,21 +38,21 @@ public class Ds3ObjectList {
     private WriteOptimization writeOptimization;
 
     @JacksonXmlProperty(isAttribute = true, namespace = "", localName = "ChunkClientProcessingOrderGuarantee")
-    private ChunkClientProcessingOrderGuarantee chunkClientProcessingOrderGuarantee;
+    private JobChunkClientProcessingOrderGuarantee chunkClientProcessingOrderGuarantee;
 
     public Ds3ObjectList() {
     }
 
-    public Ds3ObjectList(final List<Ds3Object> objects) {
-        this.objects = objects;
+    public Ds3ObjectList(final Iterable<Ds3Object> objects) {
+        this.objects = StreamSupport.stream(objects.spliterator(), false);
     }
 
-    public List<Ds3Object> getObjects() {
-        return objects;
+    public Iterable<Ds3Object> getObjects() {
+        return StreamWrapper.wrapStream(this.objects);
     }
 
-    public void setObjects(final List<Ds3Object> objects) {
-        this.objects = objects;
+    public void setObjects(final Iterable<Ds3Object> objects) {
+        this.objects = StreamSupport.stream(objects.spliterator(), false);
     }
 
     public Priority getPriority() {
@@ -66,11 +71,11 @@ public class Ds3ObjectList {
         this.writeOptimization = writeOptimization;
     }
 
-    public ChunkClientProcessingOrderGuarantee getChunkClientProcessingOrderGuarantee() {
+    public JobChunkClientProcessingOrderGuarantee getChunkClientProcessingOrderGuarantee() {
         return this.chunkClientProcessingOrderGuarantee;
     }
 
-    public void setChunkClientProcessingOrderGuarantee(final ChunkClientProcessingOrderGuarantee chunkClientProcessingOrderGuarantee) {
+    public void setChunkClientProcessingOrderGuarantee(final JobChunkClientProcessingOrderGuarantee chunkClientProcessingOrderGuarantee) {
         this.chunkClientProcessingOrderGuarantee = chunkClientProcessingOrderGuarantee;
     }
 }

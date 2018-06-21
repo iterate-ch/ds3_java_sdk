@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.spectralogic.ds3client.models.bulk.Ds3ObjectList;
 
 import java.io.IOException;
@@ -32,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class XmlOutput {
+public final class XmlOutput {
     private static final JacksonXmlModule module;
     private static final XmlMapper mapper;
 
@@ -40,6 +41,8 @@ public class XmlOutput {
         module = new JacksonXmlModule();
         module.setDefaultUseWrapper(false);
         mapper = new XmlMapper(module);
+
+        mapper.registerModule(new Jdk8Module());
         final SimpleFilterProvider filterProvider = new SimpleFilterProvider().setFailOnUnknownId(false);
         mapper.setFilterProvider(filterProvider);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -59,7 +62,7 @@ public class XmlOutput {
             }
         }
         catch(final JsonProcessingException e) {
-            throw new RuntimeException(new XmlProcessingException(e));
+            throw new XmlProcessingException(e);
         }
     }
 

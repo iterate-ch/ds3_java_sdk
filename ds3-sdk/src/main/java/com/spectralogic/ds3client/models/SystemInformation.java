@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -13,74 +13,93 @@
  * ****************************************************************************
  */
 
+// This code is auto-generated, do not modify
 package com.spectralogic.ds3client.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import java.util.UUID;
 
 @JacksonXmlRootElement(namespace = "Data")
 public class SystemInformation {
+
+    // Variables
     @JsonProperty("ApiVersion")
     private String apiVersion;
+
+    @JsonProperty("BackendActivated")
+    private boolean backendActivated;
+
     @JsonProperty("BuildInformation")
     private BuildInformation buildInformation;
+
+    @JsonProperty("InstanceId")
+    private UUID instanceId;
+
+    @JsonProperty("Now")
+    private long now;
+
     @JsonProperty("SerialNumber")
     private String serialNumber;
 
-    public String getApiVersion() {
-        return apiVersion;
+    // Constructor
+    public SystemInformation() {
+        //pass
     }
 
-    public void setApiVersion(String apiVersion) {
+    // Getters and Setters
+    
+    public String getApiVersion() {
+        return this.apiVersion;
+    }
+
+    public void setApiVersion(final String apiVersion) {
         this.apiVersion = apiVersion;
     }
 
-    public BuildInformation getBuildInformation() {
-        return buildInformation;
+
+    public boolean getBackendActivated() {
+        return this.backendActivated;
     }
 
-    public void setBuildInformation(BuildInformation buildInformation) {
+    public void setBackendActivated(final boolean backendActivated) {
+        this.backendActivated = backendActivated;
+    }
+
+
+    public BuildInformation getBuildInformation() {
+        return this.buildInformation;
+    }
+
+    public void setBuildInformation(final BuildInformation buildInformation) {
         this.buildInformation = buildInformation;
     }
 
-    public String getSerialNumber() {
-        return serialNumber;
+
+    public UUID getInstanceId() {
+        return this.instanceId;
     }
 
-    public void setSerialNumber(String serialNumber) {
+    public void setInstanceId(final UUID instanceId) {
+        this.instanceId = instanceId;
+    }
+
+
+    public long getNow() {
+        return this.now;
+    }
+
+    public void setNow(final long now) {
+        this.now = now;
+    }
+
+
+    public String getSerialNumber() {
+        return this.serialNumber;
+    }
+
+    public void setSerialNumber(final String serialNumber) {
         this.serialNumber = serialNumber;
     }
 
-    public static class BuildInformation {
-        @JsonProperty("Branch")
-        private String branch;
-        @JsonProperty("Revision")
-        private String revision;
-        @JsonProperty("Version")
-        private String version;
-
-        public String getBranch() {
-            return branch;
-        }
-
-        public void setBranch(String branch) {
-            this.branch = branch;
-        }
-
-        public String getRevision() {
-            return revision;
-        }
-
-        public void setRevision(String revision) {
-            this.revision = revision;
-        }
-
-        public String getVersion() {
-            return version;
-        }
-
-        public void setVersion(String version) {
-            this.version = version;
-        }
-    }
 }

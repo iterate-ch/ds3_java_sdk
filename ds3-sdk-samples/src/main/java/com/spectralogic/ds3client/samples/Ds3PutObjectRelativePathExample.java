@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -24,17 +24,15 @@ import com.spectralogic.ds3client.helpers.channelbuilders.PrefixAdderObjectChann
 import com.spectralogic.ds3client.helpers.channelbuilders.PrefixRemoverObjectChannelBuilder;
 import com.spectralogic.ds3client.models.Contents;
 import com.spectralogic.ds3client.models.bulk.Ds3Object;
-import com.spectralogic.ds3client.serializer.XmlProcessingException;
 
 import java.io.IOException;
 import java.nio.file.*;
-import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Ds3PutObjectRelativePathExample {
 
-    public static void main(final String args[]) throws IOException, SignatureException, XmlProcessingException {
+    public static void main(final String args[]) throws IOException {
         // Get a client builder and then build a client instance.  This is the main entry point to the SDK.
         try (final Ds3Client client = Ds3ClientBuilder.fromEnv().withHttps(false).build()) {
             /*************************************************************************************************
@@ -81,7 +79,7 @@ public class Ds3PutObjectRelativePathExample {
 
             // We now need to generate the list of Ds3Objects that we want to get from DS3.
             final List<Ds3Object> objectList = new ArrayList<>();
-            for (final Contents contents : response.getResult().getContentsList()) {
+            for (final Contents contents : response.getListBucketResult().getObjects()) {
                 objectList.add(new Ds3Object(contents.getKey(), contents.getSize()));
             }
 

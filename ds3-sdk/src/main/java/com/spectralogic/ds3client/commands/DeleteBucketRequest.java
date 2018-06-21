@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -13,28 +13,39 @@
  * ****************************************************************************
  */
 
+// This code is auto-generated, do not modify
 package com.spectralogic.ds3client.commands;
 
-import com.spectralogic.ds3client.HttpVerb;
+import com.spectralogic.ds3client.networking.HttpVerb;
+import com.spectralogic.ds3client.commands.interfaces.AbstractRequest;
 
 public class DeleteBucketRequest extends AbstractRequest {
 
-    private final String bucket;
-    public DeleteBucketRequest(final String bucket) {
-        this.bucket  = bucket;
-    }
+    // Variables
     
-    public String getBucket() {
-        return this.bucket;
+    private final String bucketName;
+
+    // Constructor
+    
+    
+    public DeleteBucketRequest(final String bucketName) {
+        this.bucketName = bucketName;
+        
     }
 
-    @Override
-    public String getPath() {
-        return "/"+ this.bucket;
-    }
 
     @Override
     public HttpVerb getVerb() {
         return HttpVerb.DELETE;
     }
+
+    @Override
+    public String getPath() {
+        return "/" + this.bucketName;
+    }
+    
+    public String getBucketName() {
+        return this.bucketName;
+    }
+
 }

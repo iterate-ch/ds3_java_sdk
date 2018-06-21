@@ -1,56 +1,86 @@
+/*
+ * ******************************************************************************
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
+ *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
+ *   this file except in compliance with the License. A copy of the License is located at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   or in the "license" file accompanying this file.
+ *   This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ *   CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ *   specific language governing permissions and limitations under the License.
+ * ****************************************************************************
+ */
+
 package com.spectralogic.ds3client.integration;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.spectralogic.ds3client.Ds3Client;
-import com.spectralogic.ds3client.commands.CancelJobRequest;
-import com.spectralogic.ds3client.commands.CancelJobResponse;
-import com.spectralogic.ds3client.commands.GetAvailableJobChunksRequest;
+import com.spectralogic.ds3client.commands.PutObjectRequest;
+import com.spectralogic.ds3client.commands.PutObjectResponse;
+import com.spectralogic.ds3client.commands.spectrads3.*;
 import com.spectralogic.ds3client.helpers.Ds3ClientHelpers;
+import com.spectralogic.ds3client.helpers.JobRecoveryException;
+import com.spectralogic.ds3client.integration.test.helpers.TempStorageIds;
+import com.spectralogic.ds3client.integration.test.helpers.TempStorageUtil;
+import com.spectralogic.ds3client.models.BulkObject;
+import com.spectralogic.ds3client.models.ChecksumType;
 import com.spectralogic.ds3client.models.Contents;
+import com.spectralogic.ds3client.models.Objects;
 import com.spectralogic.ds3client.models.bulk.Ds3Object;
 import com.spectralogic.ds3client.networking.FailedRequestException;
-import com.spectralogic.ds3client.serializer.XmlProcessingException;
+import com.spectralogic.ds3client.utils.ResourceUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.nio.channels.SeekableByteChannel;
-import java.security.SignatureException;
-import java.util.Collections;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+
+import static com.spectralogic.ds3client.integration.Util.RESOURCE_BASE_NAME;
+import static com.spectralogic.ds3client.integration.Util.deleteAllContents;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 public class Regression_Test {
 
     private static final Logger LOG = LoggerFactory.getLogger(Regression_Test.class);
 
-    private static Ds3Client client;
+    private static final Ds3Client client = Util.fromEnv();
+    private static final Ds3ClientHelpers HELPERS = Ds3ClientHelpers.wrap(client);
+    private static final String TEST_ENV_NAME = "regression_test";
+    private static TempStorageIds envStorageIds;
+    private static UUID envDataPolicyId;
 
     @BeforeClass
-    public static void startup() {
-        client = Util.fromEnv();
+    public static void startup() throws IOException {
+        envDataPolicyId = TempStorageUtil.setupDataPolicy(TEST_ENV_NAME, false, ChecksumType.Type.MD5, client);
+        envStorageIds = TempStorageUtil.setup(TEST_ENV_NAME, envDataPolicyId, client);
     }
 
     @AfterClass
     public static void teardown() throws IOException {
+        TempStorageUtil.teardown(TEST_ENV_NAME, envStorageIds, client);
         client.close();
     }
 
     @Test
-    public void testMarkerWithSpaces() throws IOException, SignatureException, XmlProcessingException {
+    public void testMarkerWithSpaces() throws IOException {
         final String bucketName = "marker_with_spaces";
-        final Ds3ClientHelpers helpers = Ds3ClientHelpers.wrap(client);
 
         try {
-            helpers.ensureBucketExists(bucketName);
+            HELPERS.ensureBucketExists(bucketName, envDataPolicyId);
 
             final List<Ds3Object> objects = Lists.newArrayList(
                     new Ds3Object("obj1_no_spaces.txt", 1024),
@@ -58,9 +88,9 @@ public class Regression_Test {
                     new Ds3Object("obj3 has spaces.txt", 1024),
                     new Ds3Object("obj4 also has spaces.txt", 1024));
 
-            final Ds3ClientHelpers.Job putJob = helpers.startWriteJob(bucketName, objects);
+            final Ds3ClientHelpers.Job putJob = HELPERS.startWriteJob(bucketName, objects);
 
-            final Iterable<Contents> objs = helpers.listObjects(bucketName, null, "obj3 has spaces.txt");
+            final Iterable<Contents> objs = HELPERS.listObjects(bucketName, null, "obj3 has spaces.txt");
             boolean foundObj4 = false;
             for (final Contents obj : objs) {
                 LOG.info("marker with spaces name: " + obj.getKey());
@@ -70,20 +100,20 @@ public class Regression_Test {
             assertTrue(Iterables.size(objs) == 1);
             assertTrue(foundObj4);
 
-            final CancelJobResponse cancelJobResponse = client.cancelJob(new CancelJobRequest(putJob.getJobId()));
-            assertEquals(204, cancelJobResponse.getStatusCode());
+            final CancelJobSpectraS3Response cancelJobResponse = client
+                    .cancelJobSpectraS3(new CancelJobSpectraS3Request(putJob.getJobId().toString()));
+            assertThat(cancelJobResponse, is(notNullValue()));
         } finally {
-            Util.deleteAllContents(client, bucketName);
+            deleteAllContents(client, bucketName);
         }
     }
 
     @Test
-    public void testPrefixWithSpaces() throws IOException, SignatureException, XmlProcessingException {
+    public void testPrefixWithSpaces() throws IOException {
         final String bucketName = "prefix_with_spaces";
-        final Ds3ClientHelpers helpers = Ds3ClientHelpers.wrap(client);
 
         try {
-            helpers.ensureBucketExists(bucketName);
+            HELPERS.ensureBucketExists(bucketName, envDataPolicyId);
 
             final List<Ds3Object> objects = Lists.newArrayList(
                     new Ds3Object("obj1_no_spaces.txt", 1024),
@@ -91,9 +121,9 @@ public class Regression_Test {
                     new Ds3Object("obj3_no_spaces.txt", 1024),
                     new Ds3Object("has spaces obj4.txt", 1024));
 
-            final Ds3ClientHelpers.Job putJob = helpers.startWriteJob(bucketName, objects);
+            final Ds3ClientHelpers.Job putJob = HELPERS.startWriteJob(bucketName, objects);
 
-            final Iterable<Contents> objs = helpers.listObjects(bucketName, "has spaces");
+            final Iterable<Contents> objs = HELPERS.listObjects(bucketName, "has spaces");
             boolean foundObj2 = false;
             boolean foundObj4 = false;
             for (final Contents obj : objs) {
@@ -106,20 +136,20 @@ public class Regression_Test {
             assertTrue(foundObj2);
             assertTrue(foundObj4);
 
-            final CancelJobResponse cancelJobResponse = client.cancelJob(new CancelJobRequest(putJob.getJobId()));
-            assertEquals(204, cancelJobResponse.getStatusCode());
+            final CancelJobSpectraS3Response cancelJobResponse = client
+                    .cancelJobSpectraS3(new CancelJobSpectraS3Request(putJob.getJobId().toString()));
+            assertThat(cancelJobResponse, is(notNullValue()));
         } finally {
-            Util.deleteAllContents(client, bucketName);
+            deleteAllContents(client, bucketName);
         }
     }
 
     @Test
-    public void testPrefixForDirectoriesWithSpaces() throws IOException, SignatureException, XmlProcessingException {
+    public void testPrefixForDirectoriesWithSpaces() throws IOException {
         final String bucketName = "prefix_directory_with_spaces";
-        final Ds3ClientHelpers helpers = Ds3ClientHelpers.wrap(client);
 
         try {
-            helpers.ensureBucketExists(bucketName);
+            HELPERS.ensureBucketExists(bucketName, envDataPolicyId);
 
             final List<Ds3Object> objects = Lists.newArrayList(
                     new Ds3Object("dir1/obj1_no_spaces.txt", 1024),
@@ -127,9 +157,9 @@ public class Regression_Test {
                     new Ds3Object("dir 2/obj3_no_spaces.txt", 1024),
                     new Ds3Object("dir 2/has spaces obj4.txt", 1024));
 
-            final Ds3ClientHelpers.Job putJob = helpers.startWriteJob(bucketName, objects);
+            final Ds3ClientHelpers.Job putJob = HELPERS.startWriteJob(bucketName, objects);
 
-            final Iterable<Contents> dir1Objs = helpers.listObjects(bucketName, "dir1/");
+            final Iterable<Contents> dir1Objs = HELPERS.listObjects(bucketName, "dir1/");
             boolean foundObj1 = false;
             boolean foundObj2 = false;
             for (final Contents obj : dir1Objs) {
@@ -142,7 +172,7 @@ public class Regression_Test {
             assertTrue(foundObj1);
             assertTrue(foundObj2);
 
-            final Iterable<Contents> objsDir2 = helpers.listObjects(bucketName, "dir 2/");
+            final Iterable<Contents> objsDir2 = HELPERS.listObjects(bucketName, "dir 2/");
             boolean foundObj3 = false;
             boolean foundObj4 = false;
             for (final Contents obj : objsDir2) {
@@ -155,30 +185,29 @@ public class Regression_Test {
             assertTrue(foundObj3);
             assertTrue(foundObj4);
 
-            final CancelJobResponse cancelJobResponse = client.cancelJob(new CancelJobRequest(putJob.getJobId()));
-            assertEquals(204, cancelJobResponse.getStatusCode());
+            final CancelJobSpectraS3Response cancelJobResponse = client
+                    .cancelJobSpectraS3(new CancelJobSpectraS3Request(putJob.getJobId().toString()));
+            assertThat(cancelJobResponse, is(notNullValue()));
         } finally {
-            Util.deleteAllContents(client, bucketName);
+            deleteAllContents(client, bucketName);
         }
     }
 
     @Test
-    public void testPrefixForNestedDirectories() throws IOException, SignatureException, XmlProcessingException {
+    public void testPrefixForNestedDirectories() throws IOException {
         final String bucketName = "prefix__nested_directory";
-        final Ds3ClientHelpers helpers = Ds3ClientHelpers.wrap(client);
 
         try {
-            helpers.ensureBucketExists(bucketName);
-
+            HELPERS.ensureBucketExists(bucketName, envDataPolicyId);
             final List<Ds3Object> objects = Lists.newArrayList(
                     new Ds3Object("dir1/obj1_no_spaces.txt", 1024),
                     new Ds3Object("dir1/has spaces obj2.txt", 1024),
                     new Ds3Object("dir1/dir 2/obj3_no_spaces.txt", 1024),
                     new Ds3Object("dir1/dir 2/has spaces obj4.txt", 1024));
 
-            final Ds3ClientHelpers.Job putJob = helpers.startWriteJob(bucketName, objects);
+            final Ds3ClientHelpers.Job putJob = HELPERS.startWriteJob(bucketName, objects);
 
-            final Iterable<Contents> dir1Objs = helpers.listObjects(bucketName, "dir1/");
+            final Iterable<Contents> dir1Objs = HELPERS.listObjects(bucketName, "dir1/");
             boolean foundObj1 = false;
             boolean foundObj2 = false;
             for (final Contents obj : dir1Objs) {
@@ -191,7 +220,7 @@ public class Regression_Test {
             assertTrue(foundObj1);
             assertTrue(foundObj2);
 
-            final Iterable<Contents> objsDir2 = helpers.listObjects(bucketName, "dir1/dir 2/");
+            final Iterable<Contents> objsDir2 = HELPERS.listObjects(bucketName, "dir1/dir 2/");
             boolean foundObj3 = false;
             boolean foundObj4 = false;
             for (final Contents obj : objsDir2) {
@@ -204,31 +233,30 @@ public class Regression_Test {
             assertTrue(foundObj3);
             assertTrue(foundObj4);
 
-            final CancelJobResponse cancelJobResponse = client.cancelJob(new CancelJobRequest(putJob.getJobId()));
-            assertEquals(204, cancelJobResponse.getStatusCode());
+            final CancelJobSpectraS3Response cancelJobResponse = client
+                    .cancelJobSpectraS3(new CancelJobSpectraS3Request(putJob.getJobId().toString()));
+            assertThat(cancelJobResponse, is(notNullValue()));
         } finally {
-            Util.deleteAllContents(client, bucketName);
+            deleteAllContents(client, bucketName);
         }
     }
 
     @Test
-    public void emptyObjectTest() throws IOException, SignatureException, XmlProcessingException {
+    public void emptyObjectTest() throws IOException {
         Util.assumeVersion1_2(client);
         final String bucketName = "emptyObject";
         final List<Ds3Object> objects = Collections.singletonList(new Ds3Object("obj1.txt", 0));
 
         try {
+            HELPERS.ensureBucketExists(bucketName, envDataPolicyId);
 
-            final Ds3ClientHelpers helpers = Ds3ClientHelpers.wrap(client);
-
-            helpers.ensureBucketExists(bucketName);
-
-            final Ds3ClientHelpers.Job job = helpers.startWriteJob(bucketName, objects);
+            final Ds3ClientHelpers.Job job = HELPERS.startWriteJob(bucketName, objects);
 
             assertThat(job, is(notNullValue()));
 
             try {
-                client.getAvailableJobChunks(new GetAvailableJobChunksRequest(job.getJobId()));
+                client.getJobChunksReadyForClientProcessingSpectraS3(
+                        new GetJobChunksReadyForClientProcessingSpectraS3Request(job.getJobId().toString()));
                 fail();
             } catch(final FailedRequestException e) {
                 assertThat(e.getStatusCode(), is(404)); // this returns 410 in bp 3.0
@@ -242,8 +270,55 @@ public class Regression_Test {
                 }
             });
         } finally {
-            Util.deleteAllContents(client, bucketName);
+            deleteAllContents(client, bucketName);
         }
+    }
 
+    @Test
+    public void testRecoverWriteJobWithHelper() throws IOException, JobRecoveryException, URISyntaxException {
+        final String bucketName = "test_recover_write_job_bucket";
+        final String book1 = "beowulf.txt";
+        final String book2 = "ulysses.txt";
+
+        try {
+            HELPERS.ensureBucketExists(bucketName, envDataPolicyId);
+
+            final Path objPath1 = ResourceUtils.loadFileResource(RESOURCE_BASE_NAME + book1);
+            final Path objPath2 = ResourceUtils.loadFileResource(RESOURCE_BASE_NAME + book2);
+            final Ds3Object obj1 = new Ds3Object(book1, Files.size(objPath1));
+            final Ds3Object obj2 = new Ds3Object(book2, Files.size(objPath2));
+
+            final Ds3ClientHelpers.Job job = Ds3ClientHelpers.wrap(client).startWriteJob(bucketName, Lists.newArrayList(obj1, obj2));
+
+            final PutObjectResponse putResponse1 = client.putObject(new PutObjectRequest(
+                    job.getBucketName(),
+                    book1,
+                    new ResourceObjectPutter(RESOURCE_BASE_NAME).buildChannel(book1),
+                    job.getJobId().toString(),
+                    0,
+                    Files.size(objPath1)));
+            assertThat(putResponse1, is(notNullValue()));
+
+            // Interuption...
+            final Ds3ClientHelpers.Job recoverJob = HELPERS.recoverWriteJob(job.getJobId());
+
+            recoverJob.transfer(new Ds3ClientHelpers.ObjectChannelBuilder() {
+                @Override
+                public SeekableByteChannel buildChannel(final String key) throws IOException {
+                    return Files.newByteChannel(objPath2, StandardOpenOption.READ);
+                }
+            });
+
+            final GetJobSpectraS3Response finishedJob = client.getJobSpectraS3(new GetJobSpectraS3Request(job.getJobId()));
+
+            for (final Objects objects : finishedJob.getMasterObjectListResult().getObjects()) {
+                for (final BulkObject bulkObject : objects.getObjects()) {
+                    assertTrue(bulkObject.getInCache());
+                }
+            }
+
+        } finally {
+            deleteAllContents(client, bucketName);
+        }
     }
 }

@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -15,11 +15,13 @@
 
 package com.spectralogic.ds3client.helpers.options;
 
-import com.spectralogic.ds3client.models.bulk.Priority;
+import com.spectralogic.ds3client.models.Priority;
 
 public class ReadJobOptions {
 
     private Priority priority;
+
+    private String name;
 
     private ReadJobOptions() {}
 
@@ -32,11 +34,24 @@ public class ReadJobOptions {
         return this;
     }
 
+    public ReadJobOptions withName(final String name) {
+        this.name = name;
+        return this;
+    }
+
     public Priority getPriority() {
         return priority;
     }
 
     public void setPriority(final Priority priority) {
         this.priority = priority;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
     }
 }

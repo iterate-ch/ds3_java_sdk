@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -16,13 +16,10 @@
 package com.spectralogic.ds3client.helpers;
 
 import com.spectralogic.ds3client.helpers.Ds3ClientHelpers.ObjectChannelBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.spectralogic.ds3client.utils.FileUtils;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
@@ -46,21 +43,10 @@ public class FileObjectPutter implements ObjectChannelBuilder {
 
         final Path path = this.root.resolve(key);
 
-        return FileChannel.open(resolveForSymbolic(path), StandardOpenOption.READ);
-    }
-
-    private static Path resolveForSymbolic(final Path path) throws IOException {
-        if (Files.isSymbolicLink(path)) {
-            final Path simLink = Files.readSymbolicLink(path);
-            if (!simLink.isAbsolute()) {
-                // Resolve the path such that the path is relative to the symbolically
-                // linked file's directory
-                final Path symLinkParent = path.toAbsolutePath().getParent();
-                return symLinkParent.resolve(simLink);
-            }
-
-            return simLink;
+        if ( ! FileUtils.isTransferablePath(path)) {
+            throw new UnrecoverableIOException(path + " is not a regular file.");
         }
-        return path;
+
+        return FileChannel.open(FileUtils.resolveForSymbolic(path), StandardOpenOption.READ);
     }
 }

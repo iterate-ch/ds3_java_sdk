@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -17,24 +17,29 @@ package com.spectralogic.ds3client.samples;
 
 import com.spectralogic.ds3client.Ds3Client;
 import com.spectralogic.ds3client.Ds3ClientBuilder;
-import com.spectralogic.ds3client.commands.*;
+import com.spectralogic.ds3client.commands.GetBucketRequest;
+import com.spectralogic.ds3client.commands.GetBucketResponse;
+import com.spectralogic.ds3client.commands.GetObjectRequest;
+import com.spectralogic.ds3client.commands.spectrads3.GetBulkJobSpectraS3Request;
+import com.spectralogic.ds3client.commands.spectrads3.GetBulkJobSpectraS3Response;
+import com.spectralogic.ds3client.models.BulkObject;
 import com.spectralogic.ds3client.models.Contents;
-import com.spectralogic.ds3client.models.bulk.BulkObject;
+import com.spectralogic.ds3client.models.Objects;
+import com.spectralogic.ds3client.models.MasterObjectList;
 import com.spectralogic.ds3client.models.bulk.Ds3Object;
-import com.spectralogic.ds3client.models.bulk.MasterObjectList;
-import com.spectralogic.ds3client.models.bulk.Objects;
-import com.spectralogic.ds3client.serializer.XmlProcessingException;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.nio.file.*;
-import java.security.SignatureException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Ds3BulkGetExample {
 
-    public static void main(final String args[]) throws IOException, SignatureException, XmlProcessingException {
+    public static void main(final String args[]) throws IOException {
 
         // Get a client builder and then build a client instance.  This is the main entry point to the SDK.
         try (final Ds3Client client = Ds3ClientBuilder.fromEnv().withHttps(false).build()) {
@@ -46,7 +51,7 @@ public class Ds3BulkGetExample {
 
             // We now need to generate the list of Ds3Objects that we want to get from DS3.
             final List<Ds3Object> objectList = new ArrayList<>();
-            for (final Contents contents : response.getResult().getContentsList()) {
+            for (final Contents contents : response.getListBucketResult().getObjects()) {
                 objectList.add(new Ds3Object(contents.getKey(), contents.getSize()));
             }
 
@@ -59,12 +64,13 @@ public class Ds3BulkGetExample {
             }
 
             // Prime DS3 with the BulkGet command so that it can start to get objects off of tape.
-            final BulkGetResponse bulkResponse = client.bulkGet(new BulkGetRequest(bucket, objectList));
+            final GetBulkJobSpectraS3Response bulkResponse = client
+                    .getBulkJobSpectraS3(new GetBulkJobSpectraS3Request(bucket, objectList));
 
             // The bulk response returns a list of lists which is designed to optimize data transmission from DS3.
-            final MasterObjectList list = bulkResponse.getResult();
+            final MasterObjectList list = bulkResponse.getMasterObjectList();
             for (final Objects objects : list.getObjects()) {
-                for (final BulkObject obj : objects) {
+                for (final BulkObject obj : objects.getObjects()) {
                     final FileChannel channel = FileChannel.open(
                             dirPath.resolve(obj.getName()),
                             StandardOpenOption.WRITE,
@@ -80,9 +86,9 @@ public class Ds3BulkGetExample {
                     client.getObject(new GetObjectRequest(
                             bucket,
                             obj.getName(),
-                            obj.getOffset(),
-                            list.getJobId(),
-                            channel
+                            channel,
+                            list.getJobId().toString(),
+                            obj.getOffset()
                     ));
                 }
             }

@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -13,48 +13,48 @@
  * ****************************************************************************
  */
 
+// This code is auto-generated, do not modify
 package com.spectralogic.ds3client.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import java.util.List;
+import java.util.ArrayList;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 
-import java.util.List;
-
+@JacksonXmlRootElement(namespace = "ListAllMyBucketsResult")
 public class ListAllMyBucketsResult {
 
-    @JsonProperty("Owner")
-    private Owner owner;
-
+    // Variables
     @JsonProperty("Buckets")
     @JacksonXmlElementWrapper(useWrapping = true)
-    private List<Bucket> buckets;
+    private List<BucketDetails> buckets = new ArrayList<>();
 
-    public ListAllMyBucketsResult() {}
+    @JsonProperty("Owner")
+    private User owner;
 
-    public Owner getOwner() {
-        return owner;
+    // Constructor
+    public ListAllMyBucketsResult() {
+        //pass
     }
 
-    public void setOwner(final Owner owner) {
-        this.owner = owner;
+    // Getters and Setters
+    
+    public List<BucketDetails> getBuckets() {
+        return this.buckets;
     }
 
-    public List<Bucket> getBuckets() {
-        return buckets;
-    }
-
-    public void setBuckets(final List<Bucket> buckets) {
+    public void setBuckets(final List<BucketDetails> buckets) {
         this.buckets = buckets;
     }
 
-    @Override
-    public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("{{owner:: ").append(owner.toString()).append("},\n");
-        if(buckets != null) {
-            builder.append("{buckets:: ").append(buckets.toString()).append("}}");
-        }
 
-        return builder.toString();
+    public User getOwner() {
+        return this.owner;
     }
+
+    public void setOwner(final User owner) {
+        this.owner = owner;
+    }
+
 }

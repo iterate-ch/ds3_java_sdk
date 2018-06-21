@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -15,6 +15,7 @@
 
 package com.spectralogic.ds3client.helpers;
 
+import com.spectralogic.ds3client.helpers.events.SameThreadEventRunner;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -78,7 +79,7 @@ public class ObjectPartTrackerImpl_CompletePart_Test {
             new Object[] { "completely after", false, Arrays.asList(new ObjectPart(201L, 99L)) }
         );
     }
-    
+
     @Test
     public void completePartFiresExpectedEvents() {
         if (this.shouldSucceed) {
@@ -93,7 +94,7 @@ public class ObjectPartTrackerImpl_CompletePart_Test {
             new ObjectPart(0L, 100L),
             new ObjectPart(100L, 100L),
             new ObjectPart(200L, 100L)
-        ));
+        ), new SameThreadEventRunner());
         final List<Object> events = new ArrayList<>();
         tracker.attachDataTransferredListener(new DataTransferredListener() {
             @Override
@@ -123,7 +124,7 @@ public class ObjectPartTrackerImpl_CompletePart_Test {
     }
 
     private void checkFailure() {
-        final ObjectPartTracker tracker = new ObjectPartTrackerImpl(this.name, Arrays.asList(new ObjectPart(100L, 100L)));
+        final ObjectPartTracker tracker = new ObjectPartTrackerImpl(this.name, Arrays.asList(new ObjectPart(100L, 100L)), new SameThreadEventRunner());
         try {
             tracker.completePart(this.parts.iterator().next());
             Assert.fail();
