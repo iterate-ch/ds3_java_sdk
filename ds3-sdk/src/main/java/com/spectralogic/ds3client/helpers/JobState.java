@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -15,93 +15,113 @@
 
 package com.spectralogic.ds3client.helpers;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMultimap;
-import com.spectralogic.ds3client.helpers.AutoCloseableCache.ValueBuilder;
-import com.spectralogic.ds3client.helpers.Ds3ClientHelpers.ObjectChannelBuilder;
-import com.spectralogic.ds3client.helpers.channels.RangedSeekableByteChannel;
-import com.spectralogic.ds3client.helpers.channels.WindowedChannelFactory;
-import com.spectralogic.ds3client.models.Range;
-import com.spectralogic.ds3client.models.bulk.BulkObject;
-import com.spectralogic.ds3client.models.bulk.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.common.collect.Sets;
+import com.spectralogic.ds3client.models.BulkObject;
+import com.spectralogic.ds3client.models.Objects;
+import com.spectralogic.ds3client.models.PhysicalPlacement;
 
-import java.io.IOException;
-import java.nio.channels.SeekableByteChannel;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Set;
+import java.util.UUID;
 
-class JobState implements AutoCloseable {
+public class JobState {
+    private final Set<BlobIdentityDecorator> blobs = Sets.newConcurrentHashSet();
 
-    private static final Logger LOG = LoggerFactory.getLogger(JobState.class);
+    private final int numBlobsInJob;
 
-    private final AtomicInteger objectsRemaining;
-    private final AutoCloseableCache<String, WindowedChannelFactory> channelCache;
-    private final JobPartTracker partTracker;
+    public JobState(final Collection<Objects> chunksThatContainBlobs) {
+        int numBlobsInChunks = 0;
 
-    public JobState(final ObjectChannelBuilder channelBuilder, final Collection<Objects> filteredChunks, final JobPartTracker partTracker, final ImmutableMap<String, ImmutableMultimap<BulkObject, Range>> objectRanges) {
-        this.objectsRemaining = new AtomicInteger(getObjectCount(filteredChunks));
-        this.channelCache = buildCache(channelBuilder, objectRanges);
-        this.partTracker = partTracker.attachObjectCompletedListener(new ObjectCompletedListenerImpl());
-    }
-    
-    public boolean hasObjects() {
-        return this.objectsRemaining.get() > 0;
-    }
-
-    private static int getObjectCount(final Collection<Objects> chunks) {
-        final HashSet<String> result = new HashSet<>();
-        for (final Objects chunk : chunks) {
-            for (final BulkObject bulkObject : chunk.getObjects()) {
-                result.add(bulkObject.getName());
+        for (final Objects chunk : chunksThatContainBlobs) {
+            for (final BulkObject blob : chunk.getObjects()) {
+                blobs.add(new BlobIdentityDecorator(blob));
+                ++numBlobsInChunks;
             }
         }
-        return result.size();
+
+        numBlobsInJob = numBlobsInChunks;
     }
 
-    private static AutoCloseableCache<String, WindowedChannelFactory> buildCache(
-            final ObjectChannelBuilder channelBuilder,
-            final ImmutableMap<String, ImmutableMultimap<BulkObject, Range>> objectRanges) {
-        return new AutoCloseableCache<>(
-            new ValueBuilder<String, WindowedChannelFactory>() {
-                @Override
-                public WindowedChannelFactory get(final String key) {
-                    try {
-                        LOG.debug("Opening channel for : " + key);
-                        return new WindowedChannelFactory(RangedSeekableByteChannel.wrap(channelBuilder.buildChannel(key), objectRanges.get(key)));
-                    } catch (final IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        );
+    public boolean blobTransferredOrFailed(final BulkObject blob) {
+        return blobs.remove(new BlobIdentityDecorator(blob));
     }
 
-    @Override
-    public void close() throws Exception {
-        this.channelCache.close();
+    public boolean contains(final BulkObject blob) {
+        return blobs.contains(new BlobIdentityDecorator(blob));
     }
 
-    public JobPartTracker getPartTracker() {
-        return partTracker;
+    public int numBlobsInJob() {
+        return numBlobsInJob;
     }
 
-    private final class ObjectCompletedListenerImpl implements ObjectCompletedListener {
+    /**
+     * This class is used to know whether we have attempted to transfer a blob.  In getting the master object list from
+     * a call to either getBulkJobSpectraS3 or putBulkJobSpectraS3, the resulting blobs will have their inCache property
+     * marked false.  In the master object list returned from a call to either allocateChunk or
+     * getJobChunksReadyForClientProcessingSpectraS3, the resulting blobs may or may not have the same value for
+     * their inCache property.  Since the BlackPearl may continually send us a blob that will always fail to transfer,
+     * we check to see if a blob in the master object list we get during a transfer is in the master object list we
+     * get when initiating a job.  If not, we can assume that we have previously tried and failed to transfer that
+     * blob and skip it.
+     */
+    private static class BlobIdentityDecorator {
+        private final String bucket;
+
+        private final UUID id;
+
+        private final boolean latest;
+
+        private final long length;
+
+        private final String name;
+
+        private final long offset;
+
+        private final PhysicalPlacement physicalPlacement;
+
+        private final long version;
+
+        private BlobIdentityDecorator(final BulkObject blob) {
+            this.bucket = blob.getBucket();
+            this.id = blob.getId();
+            this.latest = blob.getLatest();
+            this.length = blob.getLength();
+            this.name = blob.getName();
+            this.offset = blob.getOffset();
+            this.physicalPlacement = blob.getPhysicalPlacement();
+            this.version = blob.getVersion();
+        }
+
         @Override
-        public void objectCompleted(final String name) {
-            JobState.this.objectsRemaining.decrementAndGet();
-            try {
-                LOG.debug("Closing file: "  + name);
-                JobState.this.channelCache.close(name);
-            } catch (final Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (!(o instanceof BlobIdentityDecorator)) return false;
 
-    public SeekableByteChannel getChannel(final String name, final long offset, final long length) {
-        return this.channelCache.get(name).get(offset, length);
+            final BlobIdentityDecorator that = (BlobIdentityDecorator) o;
+
+            if (latest != that.latest) return false;
+            if (length != that.length) return false;
+            if (offset != that.offset) return false;
+            if (version != that.version) return false;
+            if (bucket != null ? !bucket.equals(that.bucket) : that.bucket != null) return false;
+            if (id != null ? !id.equals(that.id) : that.id != null) return false;
+            if (name != null ? !name.equals(that.name) : that.name != null) return false;
+            return physicalPlacement != null ? physicalPlacement.equals(that.physicalPlacement) : that.physicalPlacement == null;
+        }
+
+        @Override
+        public int hashCode() {
+            return java.util.Objects.hash(bucket, id, latest, length, name, offset, physicalPlacement, version);
+        }
+
+        @Override
+        public String toString() {
+            return "BlobIdentityDecorator{" +
+                    "bucket='" + bucket + '\'' +
+                    ", length=" + length +
+                    ", name='" + name + '\'' +
+                    ", offset=" + offset +
+                    '}';
+        }
     }
 }

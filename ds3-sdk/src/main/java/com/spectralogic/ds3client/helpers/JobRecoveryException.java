@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -18,11 +18,11 @@ package com.spectralogic.ds3client.helpers;
 public class JobRecoveryException extends Exception {
     private static final long serialVersionUID = -4418169724222972364L;
     
-    JobRecoveryException(final String expectedType, final String actualType) {
-        super(buildMessage(expectedType, actualType));
+    public JobRecoveryException(final String message) {
+        super(message);
     }
 
-    private static String buildMessage(final String expectedType, final String actualType) {
-        return String.format("Expected job type '%s' but the actual job was of type '%s'.", expectedType, actualType);
+    public JobRecoveryException(final String message, final Throwable cause) {
+        super(message, cause);
     }
 }

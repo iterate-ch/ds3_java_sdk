@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -46,7 +46,7 @@ public class Ds3InputStreamEntity extends InputStreamEntity {
     @Override
     public void writeTo(final OutputStream outStream) throws IOException {
         final long startTime = PerformanceUtils.getCurrentTime();
-        final long totalBytes = IOUtils.copy(this.getContent(), outStream, bufferSize);
+        final long totalBytes = IOUtils.copy(this.getContent(), outStream, bufferSize, path, true);
         final long endTime = PerformanceUtils.getCurrentTime();
 
         if (this.getContentLength() != -1 && totalBytes != this.getContentLength()) {

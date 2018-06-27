@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -100,7 +100,7 @@ public class SeekableByteChannelInputStream_Test {
         final byte[] resultBuffer = new byte[expectedBytes.length];
         final byte[] buffer = new byte[10];
         int position = 0;
-        int bytesRead = 0;
+        int bytesRead;
         while (0 < (bytesRead = inputStream.read(buffer, 5, 5))) {
             for (int i = 0; i < bytesRead; i++) {
                 resultBuffer[position] = buffer[5 + i];

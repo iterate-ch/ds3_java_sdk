@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -16,6 +16,7 @@
 package com.spectralogic.ds3client.helpers;
 
 import com.google.common.collect.Sets;
+import com.spectralogic.ds3client.helpers.events.EventRunner;
 
 import java.security.InvalidParameterException;
 import java.util.Collection;
@@ -27,11 +28,13 @@ class ObjectPartTrackerImpl implements ObjectPartTracker {
     private final TreeSet<ObjectPart> parts;
     private final Set<DataTransferredListener> dataTransferredListeners = Sets.newIdentityHashSet();
     private final Set<ObjectCompletedListener> objectCompletedListeners = Sets.newIdentityHashSet();
+    private final EventRunner eventRunner;
 
-    public ObjectPartTrackerImpl(final String name, final Collection<ObjectPart> parts) {
+    public ObjectPartTrackerImpl(final String name, final Collection<ObjectPart> parts, final EventRunner eventRunner) {
         this.name = name;
         this.parts = new TreeSet<>(ObjectPartComparator.instance());
         this.parts.addAll(parts);
+        this.eventRunner = eventRunner;
         validateParts();
     }
 
@@ -97,13 +100,23 @@ class ObjectPartTrackerImpl implements ObjectPartTracker {
     
     private void onDataTransferred(final long size) {
         for (final DataTransferredListener listener : this.dataTransferredListeners) {
-            listener.dataTransferred(size);
+            eventRunner.emitEvent(new Runnable() {
+                @Override
+                public void run() {
+                    listener.dataTransferred(size);
+                }
+            });
         }
     }
     
     private void onObjectCompleted() {
         for (final ObjectCompletedListener listener : this.objectCompletedListeners) {
-            listener.objectCompleted(this.name);
+            eventRunner.emitEvent(new Runnable() {
+                @Override
+                public void run() {
+                    listener.objectCompleted(name);
+                }
+            });
         }
     }
 }

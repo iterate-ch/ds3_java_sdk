@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -30,7 +30,7 @@ public class JobPartTracker_Test {
         final Map<String, ObjectPartTracker> trackers = new HashMap<>();
         trackers.put("foo", fooTracker);
         trackers.put("bar", barTracker);
-        final JobPartTracker jobPartTracker = new JobPartTracker(trackers);
+        final JobPartTracker jobPartTracker = new JobPartTrackerImpl(trackers);
 
         final ObjectPart[] partsRemoved = {
             new ObjectPart(10, 11),
@@ -65,7 +65,7 @@ public class JobPartTracker_Test {
         final List<Long> sizes = new ArrayList<>();
         final List<String> objects = new ArrayList<>();
 
-        final JobPartTracker jobPartTracker = new JobPartTracker(trackers);
+        final JobPartTracker jobPartTracker = new JobPartTrackerImpl(trackers);
         jobPartTracker.attachDataTransferredListener(new DataTransferredListener() {
             @Override
             public void dataTransferred(final long size) {

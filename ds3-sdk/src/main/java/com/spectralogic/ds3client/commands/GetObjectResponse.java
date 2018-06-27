@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -13,55 +13,31 @@
  * ****************************************************************************
  */
 
+// This code is auto-generated, do not modify
 package com.spectralogic.ds3client.commands;
 
-import com.spectralogic.ds3client.exceptions.ContentLengthNotMatchException;
+import com.spectralogic.ds3client.commands.interfaces.AbstractResponse;
+import com.spectralogic.ds3client.models.ChecksumType;
 import com.spectralogic.ds3client.networking.Metadata;
-import com.spectralogic.ds3client.networking.WebResponse;
-import com.spectralogic.ds3client.utils.IOUtils;
-import com.spectralogic.ds3client.utils.PerformanceUtils;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.channels.WritableByteChannel;
 
 public class GetObjectResponse extends AbstractResponse {
-    private Metadata metadata;
-    private long objectSize;
-    public GetObjectResponse(final WebResponse response, final WritableByteChannel destinationChannel, final int bufferSize, final String objName) throws IOException {
-        super(response);
-        download(destinationChannel, bufferSize, objName);
+    
+    private final Metadata metadata;
+
+    private final long objectSize;
+
+    public GetObjectResponse(final Metadata metadata, final long objectSize, final String checksum, final ChecksumType.Type checksumType) {
+        super(checksum, checksumType);
+        this.metadata = metadata;
+        this.objectSize = objectSize;
     }
 
     public Metadata getMetadata() {
-        return metadata;
-    }
-
-    @Override
-    protected void processResponse() throws IOException {
-        this.checkStatusCode(200, 206);
-        this.metadata = new MetadataImpl(this.getResponse().getHeaders());
-        this.objectSize = getSizeFromHeaders(this.getResponse().getHeaders());
-    }
-
-    protected void download(final WritableByteChannel destinationChannel, final int bufferSize, final String objName) throws IOException {
-        try (
-                final WebResponse response = this.getResponse();
-                final InputStream responseStream = response.getResponseStream()) {
-            final long startTime = PerformanceUtils.getCurrentTime();
-            final long totalBytes = IOUtils.copy(responseStream, destinationChannel, bufferSize);
-            destinationChannel.close();
-            final long endTime = PerformanceUtils.getCurrentTime();
-
-            if (this.objectSize != -1 && totalBytes != this.objectSize) {
-                throw new ContentLengthNotMatchException(objName, objectSize, totalBytes);
-            }
-
-            PerformanceUtils.logMbps(startTime, endTime, totalBytes, objName, false);
-        }
+        return this.metadata;
     }
 
     public long getObjectSize() {
-        return objectSize;
+        return this.objectSize;
     }
+
 }

@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -13,39 +13,24 @@
  * ****************************************************************************
  */
 
+// This code is auto-generated, do not modify
 package com.spectralogic.ds3client.commands;
 
-
 import com.spectralogic.ds3client.models.ListBucketResult;
-import com.spectralogic.ds3client.networking.WebResponse;
-import com.spectralogic.ds3client.serializer.XmlOutput;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.InputStream;
+import com.spectralogic.ds3client.models.ChecksumType;
+import com.spectralogic.ds3client.commands.interfaces.AbstractResponse;
 
 public class GetBucketResponse extends AbstractResponse {
-    private final static Logger LOG = LoggerFactory.getLogger(GetBucketResponse.class);
-    private ListBucketResult result;
+    
+    private final ListBucketResult listBucketResult;
 
-    public GetBucketResponse(final WebResponse response) throws IOException {
-        super(response);
-
+    public GetBucketResponse(final ListBucketResult listBucketResult, final String checksum, final ChecksumType.Type checksumType) {
+        super(checksum, checksumType);
+        this.listBucketResult = listBucketResult;
     }
 
-    public ListBucketResult getResult() {
-        return this.result;
+    public ListBucketResult getListBucketResult() {
+        return this.listBucketResult;
     }
 
-    @Override
-    protected void processResponse() throws IOException {
-        try (final WebResponse response = this.getResponse();
-             final InputStream contentStream = response.getResponseStream()) {
-            this.checkStatusCode(200);
-            LOG.debug("Starting bucket xml parsing");
-            this.result = XmlOutput.fromXml(contentStream, ListBucketResult.class);
-            LOG.debug("Finished bucket xml parsing");
-        }
-    }
 }

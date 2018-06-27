@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -16,6 +16,7 @@
 package com.spectralogic.ds3client.helpers;
 
 import com.spectralogic.ds3client.helpers.Ds3ClientHelpers.ObjectChannelBuilder;
+import com.spectralogic.ds3client.utils.FileUtils;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
@@ -43,13 +44,17 @@ public class FileObjectGetter implements ObjectChannelBuilder {
         final Path objectPath = this.root.resolve(key);
         final Path parentPath = objectPath.getParent();
         if (parentPath != null) {
-            Files.createDirectories(parentPath);
+            Files.createDirectories(FileUtils.resolveForSymbolic(parentPath));
         }
+
+        if ( ! FileUtils.isTransferablePath(objectPath)) {
+            throw new UnrecoverableIOException(objectPath + " is not a regular file.");
+        }
+
         return FileChannel.open(
-            objectPath,
-            StandardOpenOption.WRITE,
-            StandardOpenOption.CREATE,
-            StandardOpenOption.TRUNCATE_EXISTING
+                objectPath,
+                StandardOpenOption.WRITE,
+                StandardOpenOption.CREATE
         );
     }
 }

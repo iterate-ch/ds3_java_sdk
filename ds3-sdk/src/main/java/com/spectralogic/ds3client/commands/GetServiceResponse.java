@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -13,34 +13,24 @@
  * ****************************************************************************
  */
 
+// This code is auto-generated, do not modify
 package com.spectralogic.ds3client.commands;
 
 import com.spectralogic.ds3client.models.ListAllMyBucketsResult;
-import com.spectralogic.ds3client.networking.WebResponse;
-import com.spectralogic.ds3client.serializer.XmlOutput;
-
-import java.io.IOException;
-import java.io.InputStream;
+import com.spectralogic.ds3client.models.ChecksumType;
+import com.spectralogic.ds3client.commands.interfaces.AbstractResponse;
 
 public class GetServiceResponse extends AbstractResponse {
+    
+    private final ListAllMyBucketsResult listAllMyBucketsResult;
 
-    private ListAllMyBucketsResult result;
-
-    public GetServiceResponse(final WebResponse response) throws IOException {
-        super(response);
+    public GetServiceResponse(final ListAllMyBucketsResult listAllMyBucketsResult, final String checksum, final ChecksumType.Type checksumType) {
+        super(checksum, checksumType);
+        this.listAllMyBucketsResult = listAllMyBucketsResult;
     }
 
-    public ListAllMyBucketsResult getResult() {
-        return this.result;
+    public ListAllMyBucketsResult getListAllMyBucketsResult() {
+        return this.listAllMyBucketsResult;
     }
 
-    @Override
-    protected void processResponse() throws IOException {
-        try (final WebResponse response = this.getResponse()) {
-            this.checkStatusCode(200);
-            try (final InputStream content = response.getResponseStream()) {
-                this.result = XmlOutput.fromXml(content, ListAllMyBucketsResult.class);
-            }
-        }
-    }
 }

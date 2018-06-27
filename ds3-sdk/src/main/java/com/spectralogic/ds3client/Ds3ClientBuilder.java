@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -15,8 +15,9 @@
 
 package com.spectralogic.ds3client;
 
-import com.spectralogic.ds3client.models.Credentials;
+import com.spectralogic.ds3client.models.common.Credentials;
 import com.spectralogic.ds3client.networking.NetworkClient;
+import com.spectralogic.ds3client.networking.NetworkClientImpl;
 import com.spectralogic.ds3client.utils.Builder;
 import com.spectralogic.ds3client.utils.Guard;
 import org.slf4j.Logger;
@@ -46,7 +47,10 @@ public class Ds3ClientBuilder implements Builder<Ds3Client> {
     private boolean certificateVerification = true;
     private URI proxy = null;
     private int retries = 5;
-    private int bufferSize = 1024 * 1024;
+    private int connectionTimeoutInMillis = 5 * 1000;
+    private int bufferSizeInBytes = 1024 * 1024;
+    private int socketTimeoutInMillis = 1000 * 60 * 60;
+    private String userAgent;
 
     private Ds3ClientBuilder(final String endpoint, final Credentials credentials) throws IllegalArgumentException {
         if (Guard.isStringNullOrEmpty(endpoint)) {
@@ -55,10 +59,10 @@ public class Ds3ClientBuilder implements Builder<Ds3Client> {
         if(credentials == null || !credentials.isValid()) {
             throw new IllegalArgumentException("Credentials must be filled out.");
         }
-        this.endpoint = endpoint;
+        this.endpoint = endpoint.trim();
         this.credentials = credentials;
     }
-    
+
     /**
      * Returns a Builder which is used to customize the behavior of the Ds3Client library.
      * @param endpoint The DS3 endpoint the library should connect to.
@@ -112,11 +116,11 @@ public class Ds3ClientBuilder implements Builder<Ds3Client> {
     }
 
     /**
-     * @param bufferSize The size of the buffer to be used when writing content out to DS3.
+     * @param bufferSizeInBytes The size of the buffer to be used when writing content out to DS3.
      * @return The current builder.
      */
-    public Ds3ClientBuilder withBufferSize(final int bufferSize) {
-        this.bufferSize = bufferSize;
+    public Ds3ClientBuilder withBufferSize(final int bufferSizeInBytes) {
+        this.bufferSizeInBytes = bufferSizeInBytes;
         return this;
     }
 
@@ -135,6 +139,10 @@ public class Ds3ClientBuilder implements Builder<Ds3Client> {
      * @throws IllegalArgumentException This will be thrown if the proxy endpoint is not a valid URI.
      */
     public Ds3ClientBuilder withProxy(final String proxy) throws IllegalArgumentException {
+        if (proxy == null) {
+            LOG.info("Proxy was null");
+            return this;
+        }
         try {
             final URI proxyUri;
             if(!proxy.startsWith("http")) {
@@ -162,13 +170,51 @@ public class Ds3ClientBuilder implements Builder<Ds3Client> {
     }
 
     /**
+     * Sets the number of milliseconds to wait for a connection to be established before timing out.
+     *
+     * Default: 5 minutes
+     */
+    public Ds3ClientBuilder withConnectionTimeout(final int timeoutInMillis) {
+        this.connectionTimeoutInMillis = timeoutInMillis;
+        return this;
+    }
+
+    /**
+     * Sets the number of milliseconds to wait between data packets before timing out a request.
+     *
+     * Default: 60 minutes
+     */
+    public Ds3ClientBuilder withSocketTimeout(final int timeoutInMillis) {
+        this.socketTimeoutInMillis = timeoutInMillis;
+        return this;
+    }
+
+    /**
+     * The value to send in the http User-Agent header field.
+     * @param userAgent If null or empty, the User-Agent header field will contain a default value.
+     */
+    public Ds3ClientBuilder withUserAgent(final String userAgent) {
+        this.userAgent = userAgent;
+        return this;
+    }
+
+    /**
      * Returns a new Ds3Client instance.
      */
     @Override
     public Ds3Client build() {
-        LOG.info("Making connection details for endpoint: " + this.endpoint);
-        final ConnectionDetailsImpl.Builder connBuilder = ConnectionDetailsImpl.builder(this.endpoint, this.credentials)
-            .withProxy(this.proxy).withHttps(this.https).withCertificateVerification(this.certificateVerification).withRedirectRetries(this.retries).withBufferSize(this.bufferSize);
+        LOG.info("Making connection details for endpoint [{}] using this authorization id [{}]",
+                this.endpoint, this.credentials.getClientId());
+        final ConnectionDetailsImpl.Builder connBuilder = ConnectionDetailsImpl
+                .builder(this.endpoint, this.credentials)
+                .withProxy(this.proxy)
+                .withHttps(this.https)
+                .withCertificateVerification(this.certificateVerification)
+                .withRedirectRetries(this.retries)
+                .withBufferSize(this.bufferSizeInBytes)
+                .withConnectionTimeout(this.connectionTimeoutInMillis)
+                .withSocketTimeout(this.socketTimeoutInMillis)
+                .withUserAgent(this.userAgent);
 
         final NetworkClient netClient = new NetworkClientImpl(connBuilder.build());
         return new Ds3ClientImpl(netClient);

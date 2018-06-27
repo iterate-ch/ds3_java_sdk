@@ -1,3 +1,18 @@
+/*
+ * ******************************************************************************
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
+ *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
+ *   this file except in compliance with the License. A copy of the License is located at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   or in the "license" file accompanying this file.
+ *   This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ *   CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ *   specific language governing permissions and limitations under the License.
+ * ****************************************************************************
+ */
+
 package com.spectralogic.ds3client.utils.hashing;
 
 import java.util.zip.Checksum;
@@ -91,7 +106,7 @@ final class Crc32c implements Checksum {
    * @param b the new byte.
    */
   @Override
-  public void update(int b) {
+  public void update(final int b) {
     long newCrc = crc ^ LONG_MASK;
     newCrc = updateByte((byte) b, newCrc);
     crc = newCrc ^ LONG_MASK;
@@ -104,7 +119,7 @@ final class Crc32c implements Checksum {
    * @param len the length of data to examine.
    */
   @Override
-  public void update(byte[] bArray, int off, int len) {
+  public void update(final byte[] bArray, final int off, final int len) {
     long newCrc = crc ^ LONG_MASK;
     for (int i = off; i < off + len; i++) {
       newCrc = updateByte(bArray[i], newCrc);
@@ -127,7 +142,7 @@ final class Crc32c implements Checksum {
    */
   public byte[] getValueAsBytes() {
     long value = crc;
-    byte[] result = new byte[4];
+    final byte[] result = new byte[4];
     for (int i = 3; i >= 0; i--) {
       result[i] = (byte) (value & 0xffL);
       value >>= 8;
@@ -143,9 +158,9 @@ final class Crc32c implements Checksum {
     crc = 0;
   }
 
-  private long updateByte(byte newByte, long crc) {
-    byte b = (byte) (newByte & BYTE_MASK);
-    int index = (int) ((crc ^ b) & BYTE_MASK);
+  private long updateByte(final byte newByte, final long crc) {
+    final byte b = (byte) (newByte & BYTE_MASK);
+    final int index = (int) ((crc ^ b) & BYTE_MASK);
     return (CRC_TABLE[index] ^ (crc >> 8)) & LONG_MASK;
   }
 }

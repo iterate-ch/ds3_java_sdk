@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -13,49 +13,84 @@
  * ****************************************************************************
  */
 
+// This code is auto-generated, do not modify
 package com.spectralogic.ds3client.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
+@JacksonXmlRootElement(namespace = "Error")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Error {
+
+    // Variables
     @JsonProperty("Code")
     private String code;
-    
+
+    @JsonProperty("HttpErrorCode")
+    private int httpErrorCode;
+
     @JsonProperty("Message")
     private String message;
-    
+
     @JsonProperty("Resource")
     private String resource;
-    
-    @JsonProperty("RequestId")
-    private String requestId;
+
+    @JsonProperty("ResourceId")
+    private long resourceId;
+
+    // Constructor
+    public Error() {
+        //pass
+    }
+
+    // Getters and Setters
     
     public String getCode() {
-        return code;
+        return this.code;
     }
+
     public void setCode(final String code) {
         this.code = code;
     }
-    public String getMessage() {
-        return message;
+
+
+    public int getHttpErrorCode() {
+        return this.httpErrorCode;
     }
+
+    public void setHttpErrorCode(final int httpErrorCode) {
+        this.httpErrorCode = httpErrorCode;
+    }
+
+
+    public String getMessage() {
+        return this.message;
+    }
+
     public void setMessage(final String message) {
         this.message = message;
     }
+
+
     public String getResource() {
-        return resource;
+        return this.resource;
     }
+
     public void setResource(final String resource) {
         this.resource = resource;
     }
-    public String getRequestId() {
-        return requestId;
+
+
+    public long getResourceId() {
+        return this.resourceId;
     }
-    public void setRequestId(final String requestId) {
-        this.requestId = requestId;
+
+    public void setResourceId(final long resourceId) {
+        this.resourceId = resourceId;
     }
+
 
     @Override
     public String toString() {

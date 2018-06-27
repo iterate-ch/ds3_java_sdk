@@ -1,10 +1,25 @@
+/*
+ * ******************************************************************************
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
+ *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
+ *   this file except in compliance with the License. A copy of the License is located at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   or in the "license" file accompanying this file.
+ *   This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ *   CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ *   specific language governing permissions and limitations under the License.
+ * ****************************************************************************
+ */
+
 package com.spectralogic.ds3client.helpers.util;
 
 import com.google.common.collect.*;
-import com.spectralogic.ds3client.models.Range;
-import com.spectralogic.ds3client.models.bulk.BulkObject;
+import com.spectralogic.ds3client.models.BulkObject;
+import com.spectralogic.ds3client.models.Objects;
+import com.spectralogic.ds3client.models.common.Range;
 import com.spectralogic.ds3client.models.bulk.Ds3Object;
-import com.spectralogic.ds3client.models.bulk.Objects;
 import com.spectralogic.ds3client.models.bulk.PartialDs3Object;
 import com.spectralogic.ds3client.utils.Guard;
 
@@ -17,7 +32,7 @@ public final class PartialObjectHelpers {
        //pass
     }
 
-    public static ImmutableMultimap<String, Range> getPartialObjectsRanges(final List<Ds3Object> objects) {
+    public static ImmutableMultimap<String, Range> getPartialObjectsRanges(final Iterable<Ds3Object> objects) {
         final ImmutableMultimap.Builder<String, Range> builder = ImmutableMultimap.builder();
 
         for (final Ds3Object obj : objects) {
@@ -29,7 +44,9 @@ public final class PartialObjectHelpers {
         return builder.build();
     }
 
-    public static ImmutableMap<String, ImmutableMultimap<BulkObject, Range>> mapRangesToBlob(final List<Objects> chunks, final ImmutableMultimap<String, Range> partialObjects) {
+    public static ImmutableMap<String, ImmutableMultimap<BulkObject, Range>> mapRangesToBlob(
+            final List<Objects> chunks,
+            final ImmutableMultimap<String, Range> partialObjects) {
 
         final Map<String, ImmutableMultimap.Builder<BulkObject, Range>> objectMapperBuilders = new HashMap<>();
 
@@ -61,10 +78,9 @@ public final class PartialObjectHelpers {
 
         Range currentRange = null;
         Range nextRange;
-        final UnmodifiableIterator<Range> rangeIterator = sortedRanges.iterator();
 
-        while (rangeIterator.hasNext()) {
-            nextRange = rangeIterator.next();
+        for (final Range sortedRange : sortedRanges) {
+            nextRange = sortedRange;
             if (currentRange == null) {
                 // This will only be called on the first iteration of the loop
                 currentRange = nextRange;
@@ -93,7 +109,8 @@ public final class PartialObjectHelpers {
         return Ordering.natural().immutableSortedCopy(builder.build());
     }
 
-    private static ImmutableMultimap.Builder<BulkObject, Range> getMultiMapBuilder(final Map<String, ImmutableMultimap.Builder<BulkObject, Range>> mapper, final String file) {
+    private static ImmutableMultimap.Builder<BulkObject, Range> getMultiMapBuilder(
+            final Map<String, ImmutableMultimap.Builder<BulkObject, Range>> mapper, final String file) {
         if (mapper.containsKey(file)) {
             return mapper.get(file);
         } else {
@@ -103,7 +120,9 @@ public final class PartialObjectHelpers {
         }
     }
 
-    private static ImmutableList<Range> getRangesForBlob(final BulkObject object, final ImmutableCollection<Range> ranges) {
+    private static ImmutableList<Range> getRangesForBlob(
+            final BulkObject object,
+            final ImmutableCollection<Range> ranges) {
         final ImmutableList.Builder<Range> builder = ImmutableList.builder();
 
         final long start = object.getOffset();

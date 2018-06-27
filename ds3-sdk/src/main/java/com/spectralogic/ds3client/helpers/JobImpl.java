@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -15,43 +15,54 @@
 
 package com.spectralogic.ds3client.helpers;
 
-import com.spectralogic.ds3client.Ds3Client;
 import com.spectralogic.ds3client.helpers.Ds3ClientHelpers.Job;
-import com.spectralogic.ds3client.models.bulk.MasterObjectList;
+import com.spectralogic.ds3client.helpers.strategy.transferstrategy.EventDispatcher;
+import com.spectralogic.ds3client.helpers.strategy.transferstrategy.TransferStrategyBuilder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 import java.util.UUID;
 
 abstract class JobImpl implements Job {
-    protected final Ds3Client client;
-    protected final MasterObjectList masterObjectList;
+    private static final Logger LOG = LoggerFactory.getLogger(JobImpl.class);
 
     protected boolean running = false;
-    protected int maxParallelRequests = 10;
 
-    public JobImpl(final Ds3Client client, final MasterObjectList masterObjectList) {
-        this.client = client;
-        this.masterObjectList = masterObjectList;
+    private final TransferStrategyBuilder transferStrategyBuilder;
+
+    public JobImpl() {
+        this(null);
     }
-    
+
+    public JobImpl(final TransferStrategyBuilder transferStrategyBuilder) {
+        this.transferStrategyBuilder = transferStrategyBuilder;
+    }
+
     @Override
     public UUID getJobId() {
-        if (this.masterObjectList == null) {
+        try {
+            return transferStrategyBuilder.masterObjectList().getJobId();
+        } catch (final Throwable t) {
+            LOG.warn("Could not get job id.", t);
             return null;
         }
-        return this.masterObjectList.getJobId();
     }
 
     @Override
     public String getBucketName() {
-        if (this.masterObjectList == null) {
+        try {
+            return transferStrategyBuilder.masterObjectList().getBucketName();
+        } catch (final Throwable t) {
+            LOG.warn("Could not get bucket name.", t);
             return null;
         }
-        return this.masterObjectList.getBucketName();
     }
-    
+
     @Override
     public Job withMaxParallelRequests(final int maxParallelRequests) {
-        this.maxParallelRequests = maxParallelRequests;
+        transferStrategyBuilder.withNumConcurrentTransferThreads(maxParallelRequests);
         return this;
     }
 
@@ -59,4 +70,76 @@ abstract class JobImpl implements Job {
         if (running) throw new IllegalStateException("You cannot modify a job after calling transfer");
     }
 
+    @Override
+    public void attachChecksumListener(final ChecksumListener listener) {
+        checkRunning();
+        eventDispatcher().attachChecksumListener(listener);
+    }
+
+    @Override
+    public void removeChecksumListener(final ChecksumListener listener) {
+        checkRunning();
+        eventDispatcher().removeChecksumListener(listener);
+    }
+
+    @Override
+    public void attachWaitingForChunksListener(final WaitingForChunksListener listener) {
+        checkRunning();
+        eventDispatcher().attachWaitingForChunksListener(listener);
+    }
+
+    @Override
+    public void removeWaitingForChunksListener(final WaitingForChunksListener listener) {
+        checkRunning();
+        eventDispatcher().removeWaitingForChunksListener(listener);
+    }
+
+    @Override
+    public void attachFailureEventListener(final FailureEventListener listener) {
+        checkRunning();
+        eventDispatcher().attachFailureEventListener(listener);
+    }
+
+    @Override
+    public void removeFailureEventListener(final FailureEventListener listener) {
+        checkRunning();
+        eventDispatcher().removeFailureEventListener(listener);
+    }
+
+    @Override
+    public void attachDataTransferredListener(final DataTransferredListener listener) {
+        checkRunning();
+        eventDispatcher().attachDataTransferredListener(listener);
+    }
+
+    @Override
+    public void removeDataTransferredListener(final DataTransferredListener listener) {
+        checkRunning();
+        eventDispatcher().removeDataTransferredListener(listener);
+    }
+
+    @Override
+    public void attachObjectCompletedListener(final ObjectCompletedListener listener) {
+        checkRunning();
+        eventDispatcher().attachObjectCompletedListener(listener);
+    }
+
+    @Override
+    public void removeObjectCompletedListener(final ObjectCompletedListener listener) {
+        checkRunning();
+        eventDispatcher().removeObjectCompletedListener(listener);
+    }
+
+    @Override
+    public void transfer(final Ds3ClientHelpers.ObjectChannelBuilder channelBuilder) throws IOException {
+        transferStrategyBuilder.withChannelBuilder(channelBuilder);
+    }
+
+    protected TransferStrategyBuilder transferStrategyBuilder() {
+        return transferStrategyBuilder;
+    }
+
+    protected EventDispatcher eventDispatcher() {
+        return transferStrategyBuilder.eventDispatcher();
+    }
 }

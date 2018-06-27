@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -17,24 +17,22 @@ package com.spectralogic.ds3client;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
-import com.spectralogic.ds3client.commands.Ds3Request;
+import com.spectralogic.ds3client.commands.interfaces.Ds3Request;
 import com.spectralogic.ds3client.networking.ConnectionDetails;
+import com.spectralogic.ds3client.networking.HttpVerb;
 import com.spectralogic.ds3client.networking.NetworkClient;
 import com.spectralogic.ds3client.networking.WebResponse;
-
 import org.apache.commons.io.IOUtils;
-
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.SignatureException;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -94,7 +92,7 @@ public class MockNetwork implements NetworkClient {
     public MockNetwork returning(
             final int statusCode,
             final String responseContent) {
-        return returning(statusCode, responseContent, new HashMap<String, String>());
+        return returning(statusCode, responseContent, new HashMap<>());
     }
     
     public Ds3Client asClient() {
@@ -103,7 +101,7 @@ public class MockNetwork implements NetworkClient {
     
     @Override
     public WebResponse getResponse(final Ds3Request request)
-            throws IOException, SignatureException {
+            throws IOException {
         assertThat(request.getVerb(), is(this.verb));
         assertThat(request.getPath(), is(this.path));
         if (this.queryParams != null) {

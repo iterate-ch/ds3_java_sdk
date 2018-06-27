@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -19,16 +19,16 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterators;
 import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
 import com.spectralogic.ds3client.BulkCommand;
 import com.spectralogic.ds3client.utils.Guard;
+import com.spectralogic.ds3client.utils.SafeStringManipulation;
 
 import javax.annotation.Nonnull;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
-public class NetUtils {
+public final class NetUtils {
 
     private NetUtils() {
         throw new IllegalStateException("This component should never be initialized.");
@@ -40,13 +40,15 @@ public class NetUtils {
 
     public static URL buildUrl(final ConnectionDetails connectionDetails, final String path, final Map<String, String> params) throws MalformedURLException {
         final StringBuilder builder = new StringBuilder();
-        builder.append(connectionDetails.isHttps()? "https": "http").append("://");
+        if (!connectionDetails.getEndpoint().startsWith("http")) {
+            builder.append(connectionDetails.isHttps() ? "https" : "http").append("://");
+        }
         builder.append(connectionDetails.getEndpoint());
         if(!path.startsWith("/")) {
             builder.append('/');
         }
 
-        final Escaper urlEscaper = UrlEscapers.urlFragmentEscaper();
+        final Escaper urlEscaper = SafeStringManipulation.getDs3Escaper();
 
         builder.append(urlEscaper.escape(path));
 
@@ -118,7 +120,16 @@ public class NetUtils {
     }
 
     public static String buildHostField(final ConnectionDetails details) {
-        return details.getEndpoint();
+        return filterHttp(details.getEndpoint());
+    }
+
+    public static String filterHttp(final String url) {
+        if (url.startsWith("http://") || url.startsWith("https://"))
+        {
+            final int colonIndex = url.indexOf(":");
+            return url.substring(colonIndex + 3);
+        }
+        return url;
     }
 
     public static int getPort(final URL url) {

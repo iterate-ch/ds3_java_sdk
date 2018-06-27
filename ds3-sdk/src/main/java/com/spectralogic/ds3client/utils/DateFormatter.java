@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2015 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -17,19 +17,20 @@ package com.spectralogic.ds3client.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
-public class DateFormatter {
+public final class DateFormatter {
     final static private String RFC822FORMAT = "EEE, dd MMM yyyy HH:mm:ss Z";
     /**
-     * Returns a RFC-882 formatted string with the current time.
+     * Returns a RFC-822 formatted string with the current time.
      */
-    public static String dateToRfc882() {
-        return dateToRfc882(new Date());
+    public static String dateToRfc822() {
+        return dateToRfc822(new Date());
     }
 
-    public static String dateToRfc882(final Date date) {
-        final SimpleDateFormat sdf = new SimpleDateFormat(RFC822FORMAT);
+    public static String dateToRfc822(final Date date) {
+        final SimpleDateFormat sdf = new SimpleDateFormat(RFC822FORMAT, Locale.US);
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
         return sdf.format(date);
     }
