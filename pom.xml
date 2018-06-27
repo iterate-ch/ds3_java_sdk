@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ch.iterate.spectralogic</groupId>
     <artifactId>ds3-parent</artifactId>
-    <version>5.0.4</version>
+    <version>5.0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
     <prerequisites>
         <maven>3.0</maven>
@@ -33,7 +33,7 @@
         <url>https://github.com/iterate-ch/ds3_java_sdk</url>
         <connection>https://github.com/iterate-ch/ds3_java_sdk</connection>
         <developerConnection>scm:git:git@github.com:iterate-ch/ds3_java_sdk.git</developerConnection>
-        <tag>ds3-parent-5.0.4</tag>
+        <tag>HEAD</tag>
     </scm>
     <modules>
         <module>ds3-sdk</module>
