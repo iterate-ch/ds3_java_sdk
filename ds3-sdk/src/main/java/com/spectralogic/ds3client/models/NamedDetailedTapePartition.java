@@ -27,6 +27,9 @@ import java.util.UUID;
 public class NamedDetailedTapePartition {
 
     // Variables
+    @JsonProperty("AutoCompactionEnabled")
+    private boolean autoCompactionEnabled;
+
     @JsonProperty("DriveType")
     private TapeDriveType driveType;
 
@@ -46,14 +49,17 @@ public class NamedDetailedTapePartition {
     @JsonProperty("LibraryId")
     private UUID libraryId;
 
+    @JsonProperty("MinimumReadReservedDrives")
+    private int minimumReadReservedDrives;
+
+    @JsonProperty("MinimumWriteReservedDrives")
+    private int minimumWriteReservedDrives;
+
     @JsonProperty("Name")
     private String name;
 
     @JsonProperty("Quiesced")
     private Quiesced quiesced;
-
-    @JsonProperty("SerialId")
-    private String serialId;
 
     @JsonProperty("SerialNumber")
     private String serialNumber;
@@ -72,6 +78,15 @@ public class NamedDetailedTapePartition {
 
     // Getters and Setters
     
+    public boolean getAutoCompactionEnabled() {
+        return this.autoCompactionEnabled;
+    }
+
+    public void setAutoCompactionEnabled(final boolean autoCompactionEnabled) {
+        this.autoCompactionEnabled = autoCompactionEnabled;
+    }
+
+
     public TapeDriveType getDriveType() {
         return this.driveType;
     }
@@ -126,6 +141,24 @@ public class NamedDetailedTapePartition {
     }
 
 
+    public int getMinimumReadReservedDrives() {
+        return this.minimumReadReservedDrives;
+    }
+
+    public void setMinimumReadReservedDrives(final int minimumReadReservedDrives) {
+        this.minimumReadReservedDrives = minimumReadReservedDrives;
+    }
+
+
+    public int getMinimumWriteReservedDrives() {
+        return this.minimumWriteReservedDrives;
+    }
+
+    public void setMinimumWriteReservedDrives(final int minimumWriteReservedDrives) {
+        this.minimumWriteReservedDrives = minimumWriteReservedDrives;
+    }
+
+
     public String getName() {
         return this.name;
     }
@@ -141,15 +174,6 @@ public class NamedDetailedTapePartition {
 
     public void setQuiesced(final Quiesced quiesced) {
         this.quiesced = quiesced;
-    }
-
-
-    public String getSerialId() {
-        return this.serialId;
-    }
-
-    public void setSerialId(final String serialId) {
-        this.serialId = serialId;
     }
 
 

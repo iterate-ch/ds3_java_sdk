@@ -28,14 +28,17 @@ public class DataPathBackend {
     @JsonProperty("Activated")
     private boolean activated;
 
+    @JsonProperty("AllowNewJobRequests")
+    private boolean allowNewJobRequests;
+
     @JsonProperty("AutoActivateTimeoutInMins")
     private Integer autoActivateTimeoutInMins;
 
     @JsonProperty("AutoInspect")
     private AutoInspectMode autoInspect;
 
-    @JsonProperty("DefaultImportConflictResolutionMode")
-    private ImportConflictResolutionMode defaultImportConflictResolutionMode;
+    @JsonProperty("CacheAvailableRetryAfterInSeconds")
+    private int cacheAvailableRetryAfterInSeconds;
 
     @JsonProperty("DefaultVerifyDataAfterImport")
     private Priority defaultVerifyDataAfterImport;
@@ -48,6 +51,9 @@ public class DataPathBackend {
 
     @JsonProperty("InstanceId")
     private UUID instanceId;
+
+    @JsonProperty("IomEnabled")
+    private boolean iomEnabled;
 
     @JsonProperty("LastHeartbeat")
     private Date lastHeartbeat;
@@ -80,6 +86,15 @@ public class DataPathBackend {
     }
 
 
+    public boolean getAllowNewJobRequests() {
+        return this.allowNewJobRequests;
+    }
+
+    public void setAllowNewJobRequests(final boolean allowNewJobRequests) {
+        this.allowNewJobRequests = allowNewJobRequests;
+    }
+
+
     public Integer getAutoActivateTimeoutInMins() {
         return this.autoActivateTimeoutInMins;
     }
@@ -98,12 +113,12 @@ public class DataPathBackend {
     }
 
 
-    public ImportConflictResolutionMode getDefaultImportConflictResolutionMode() {
-        return this.defaultImportConflictResolutionMode;
+    public int getCacheAvailableRetryAfterInSeconds() {
+        return this.cacheAvailableRetryAfterInSeconds;
     }
 
-    public void setDefaultImportConflictResolutionMode(final ImportConflictResolutionMode defaultImportConflictResolutionMode) {
-        this.defaultImportConflictResolutionMode = defaultImportConflictResolutionMode;
+    public void setCacheAvailableRetryAfterInSeconds(final int cacheAvailableRetryAfterInSeconds) {
+        this.cacheAvailableRetryAfterInSeconds = cacheAvailableRetryAfterInSeconds;
     }
 
 
@@ -140,6 +155,15 @@ public class DataPathBackend {
 
     public void setInstanceId(final UUID instanceId) {
         this.instanceId = instanceId;
+    }
+
+
+    public boolean getIomEnabled() {
+        return this.iomEnabled;
+    }
+
+    public void setIomEnabled(final boolean iomEnabled) {
+        this.iomEnabled = iomEnabled;
     }
 
 

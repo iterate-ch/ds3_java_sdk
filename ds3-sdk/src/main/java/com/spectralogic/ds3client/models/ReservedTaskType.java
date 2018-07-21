@@ -16,8 +16,8 @@
 // This code is auto-generated, do not modify
 package com.spectralogic.ds3client.models;
 
-public enum ImportConflictResolutionMode {
-    CANCEL,
-    ACCEPT_MOST_RECENT,
-    ACCEPT_EXISTING
+public enum ReservedTaskType {
+    ANY,
+    READ,
+    WRITE
 }
