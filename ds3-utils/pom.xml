@@ -4,7 +4,7 @@
     <parent>
         <groupId>ch.iterate.spectralogic</groupId>
         <artifactId>ds3-parent</artifactId>
-        <version>5.0.8-SNAPSHOT</version>
+        <version>5.0.8</version>
     </parent>
     <artifactId>ds3-utils</artifactId>
     <packaging>jar</packaging>
