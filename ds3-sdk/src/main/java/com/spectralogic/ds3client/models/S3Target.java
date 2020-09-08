@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2019 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -55,6 +55,9 @@ public class S3Target {
     @JsonProperty("Name")
     private String name;
 
+    @JsonProperty("NamingMode")
+    private CloudNamingMode namingMode;
+
     @JsonProperty("OfflineDataStagingWindowInTb")
     private int offlineDataStagingWindowInTb;
 
@@ -81,6 +84,9 @@ public class S3Target {
 
     @JsonProperty("Region")
     private S3Region region;
+
+    @JsonProperty("RestrictedAccess")
+    private boolean restrictedAccess;
 
     @JsonProperty("SecretKey")
     private String secretKey;
@@ -188,6 +194,15 @@ public class S3Target {
     }
 
 
+    public CloudNamingMode getNamingMode() {
+        return this.namingMode;
+    }
+
+    public void setNamingMode(final CloudNamingMode namingMode) {
+        this.namingMode = namingMode;
+    }
+
+
     public int getOfflineDataStagingWindowInTb() {
         return this.offlineDataStagingWindowInTb;
     }
@@ -266,6 +281,15 @@ public class S3Target {
 
     public void setRegion(final S3Region region) {
         this.region = region;
+    }
+
+
+    public boolean getRestrictedAccess() {
+        return this.restrictedAccess;
+    }
+
+    public void setRestrictedAccess(final boolean restrictedAccess) {
+        this.restrictedAccess = restrictedAccess;
     }
 
 

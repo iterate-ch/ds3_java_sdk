@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2019 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -42,6 +42,9 @@ public class TapeDrive {
 
     @JsonProperty("MfgSerialNumber")
     private String mfgSerialNumber;
+
+    @JsonProperty("MinimumTaskPriority")
+    private Priority minimumTaskPriority;
 
     @JsonProperty("PartitionId")
     private UUID partitionId;
@@ -122,6 +125,15 @@ public class TapeDrive {
 
     public void setMfgSerialNumber(final String mfgSerialNumber) {
         this.mfgSerialNumber = mfgSerialNumber;
+    }
+
+
+    public Priority getMinimumTaskPriority() {
+        return this.minimumTaskPriority;
+    }
+
+    public void setMinimumTaskPriority(final Priority minimumTaskPriority) {
+        this.minimumTaskPriority = minimumTaskPriority;
     }
 
 

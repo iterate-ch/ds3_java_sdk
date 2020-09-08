@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2019 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -18,6 +18,8 @@ package com.spectralogic.ds3client.commands;
 
 import com.spectralogic.ds3client.networking.HttpVerb;
 import com.spectralogic.ds3client.commands.interfaces.AbstractRequest;
+import java.util.UUID;
+import com.google.common.net.UrlEscapers;
 
 public class HeadObjectRequest extends AbstractRequest {
 
@@ -27,6 +29,8 @@ public class HeadObjectRequest extends AbstractRequest {
 
     private final String objectName;
 
+    private String versionId;
+
     // Constructor
     
     
@@ -35,6 +39,20 @@ public class HeadObjectRequest extends AbstractRequest {
         this.objectName = objectName;
         
     }
+
+    public HeadObjectRequest withVersionId(final UUID versionId) {
+        this.versionId = versionId.toString();
+        this.updateQueryParam("version_id", versionId);
+        return this;
+    }
+
+
+    public HeadObjectRequest withVersionId(final String versionId) {
+        this.versionId = versionId;
+        this.updateQueryParam("version_id", versionId);
+        return this;
+    }
+
 
 
     @Override
@@ -54,6 +72,11 @@ public class HeadObjectRequest extends AbstractRequest {
 
     public String getObjectName() {
         return this.objectName;
+    }
+
+
+    public String getVersionId() {
+        return this.versionId;
     }
 
 }

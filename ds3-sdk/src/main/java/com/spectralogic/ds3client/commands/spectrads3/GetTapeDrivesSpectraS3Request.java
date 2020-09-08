@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2019 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -18,6 +18,7 @@ package com.spectralogic.ds3client.commands.spectrads3;
 
 import com.spectralogic.ds3client.networking.HttpVerb;
 import com.spectralogic.ds3client.commands.interfaces.AbstractPaginationRequest;
+import com.spectralogic.ds3client.models.Priority;
 import java.util.UUID;
 import com.google.common.net.UrlEscapers;
 import com.spectralogic.ds3client.models.ReservedTaskType;
@@ -29,6 +30,8 @@ public class GetTapeDrivesSpectraS3Request extends AbstractPaginationRequest {
     // Variables
     
     private boolean lastPage;
+
+    private Priority minimumTaskPriority;
 
     private int pageLength;
 
@@ -60,6 +63,13 @@ public class GetTapeDrivesSpectraS3Request extends AbstractPaginationRequest {
         } else {
             this.getQueryParams().remove("last_page");
         }
+        return this;
+    }
+
+
+    public GetTapeDrivesSpectraS3Request withMinimumTaskPriority(final Priority minimumTaskPriority) {
+        this.minimumTaskPriority = minimumTaskPriority;
+        this.updateQueryParam("minimum_task_priority", minimumTaskPriority);
         return this;
     }
 
@@ -147,6 +157,11 @@ public class GetTapeDrivesSpectraS3Request extends AbstractPaginationRequest {
     
     public boolean getLastPage() {
         return this.lastPage;
+    }
+
+
+    public Priority getMinimumTaskPriority() {
+        return this.minimumTaskPriority;
     }
 
 

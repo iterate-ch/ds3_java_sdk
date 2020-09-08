@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2019 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -42,6 +42,8 @@ public class GetObjectRequest extends AbstractRequest {
     private final String bucketName;
 
     private final String objectName;
+
+    private boolean cachedOnly;
 
     private String job;
 
@@ -127,6 +129,17 @@ public class GetObjectRequest extends AbstractRequest {
         this.updateQueryParam("offset", offset);
 
 
+    }
+
+
+    public GetObjectRequest withCachedOnly(final boolean cachedOnly) {
+        this.cachedOnly = cachedOnly;
+        if (this.cachedOnly) {
+            this.getQueryParams().put("cached_only", null);
+        } else {
+            this.getQueryParams().remove("cached_only");
+        }
+        return this;
     }
 
 
@@ -253,6 +266,11 @@ public class GetObjectRequest extends AbstractRequest {
 
     public String getObjectName() {
         return this.objectName;
+    }
+
+
+    public boolean getCachedOnly() {
+        return this.cachedOnly;
     }
 
 

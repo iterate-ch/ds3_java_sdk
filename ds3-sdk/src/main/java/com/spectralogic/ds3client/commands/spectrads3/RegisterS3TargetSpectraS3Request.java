@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2017 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2019 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -21,6 +21,7 @@ import com.spectralogic.ds3client.commands.interfaces.AbstractRequest;
 import com.google.common.net.UrlEscapers;
 import java.lang.Integer;
 import com.spectralogic.ds3client.models.TargetReadPreferenceType;
+import com.spectralogic.ds3client.models.CloudNamingMode;
 import com.spectralogic.ds3client.models.S3Region;
 
 public class RegisterS3TargetSpectraS3Request extends AbstractRequest {
@@ -45,6 +46,8 @@ public class RegisterS3TargetSpectraS3Request extends AbstractRequest {
 
     private boolean https;
 
+    private CloudNamingMode namingMode;
+
     private int offlineDataStagingWindowInTb;
 
     private boolean permitGoingOutOfSync;
@@ -60,6 +63,8 @@ public class RegisterS3TargetSpectraS3Request extends AbstractRequest {
     private String proxyUsername;
 
     private S3Region region;
+
+    private boolean restrictedAccess;
 
     private int stagedDataExpirationInDays;
 
@@ -121,6 +126,13 @@ public class RegisterS3TargetSpectraS3Request extends AbstractRequest {
     }
 
 
+    public RegisterS3TargetSpectraS3Request withNamingMode(final CloudNamingMode namingMode) {
+        this.namingMode = namingMode;
+        this.updateQueryParam("naming_mode", namingMode);
+        return this;
+    }
+
+
     public RegisterS3TargetSpectraS3Request withOfflineDataStagingWindowInTb(final int offlineDataStagingWindowInTb) {
         this.offlineDataStagingWindowInTb = offlineDataStagingWindowInTb;
         this.updateQueryParam("offline_data_staging_window_in_tb", offlineDataStagingWindowInTb);
@@ -173,6 +185,13 @@ public class RegisterS3TargetSpectraS3Request extends AbstractRequest {
     public RegisterS3TargetSpectraS3Request withRegion(final S3Region region) {
         this.region = region;
         this.updateQueryParam("region", region);
+        return this;
+    }
+
+
+    public RegisterS3TargetSpectraS3Request withRestrictedAccess(final boolean restrictedAccess) {
+        this.restrictedAccess = restrictedAccess;
+        this.updateQueryParam("restricted_access", restrictedAccess);
         return this;
     }
 
@@ -240,6 +259,11 @@ public class RegisterS3TargetSpectraS3Request extends AbstractRequest {
     }
 
 
+    public CloudNamingMode getNamingMode() {
+        return this.namingMode;
+    }
+
+
     public int getOfflineDataStagingWindowInTb() {
         return this.offlineDataStagingWindowInTb;
     }
@@ -277,6 +301,11 @@ public class RegisterS3TargetSpectraS3Request extends AbstractRequest {
 
     public S3Region getRegion() {
         return this.region;
+    }
+
+
+    public boolean getRestrictedAccess() {
+        return this.restrictedAccess;
     }
 
 
