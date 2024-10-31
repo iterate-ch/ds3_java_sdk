@@ -1,0 +1,16 @@
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/main/java/com/spectralogic/ds3client/metadata/MACMetadataRestore.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/main/java/com/spectralogic/ds3client/metadata/MetadataRestoreFactory.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/main/java/com/spectralogic/ds3client/metadata/PosixMetadataStore.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/main/java/com/spectralogic/ds3client/metadata/PermissionsUtils.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/main/java/com/spectralogic/ds3client/metadata/WindowsMetadataException.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/main/java/com/spectralogic/ds3client/metadata/PosixMetadataRestore.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/main/java/com/spectralogic/ds3client/metadata/MetadataAccessImpl.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/main/java/com/spectralogic/ds3client/metadata/AbstractMetadataStore.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/main/java/com/spectralogic/ds3client/metadata/MetadataStoreFactory.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/main/java/com/spectralogic/ds3client/metadata/jna/Advapi32.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/main/java/com/spectralogic/ds3client/metadata/WindowsMetadataRestore.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/main/java/com/spectralogic/ds3client/metadata/WindowsMetadataStore.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/main/java/com/spectralogic/ds3client/metadata/MetadataReceivedListenerImpl.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/main/java/com/spectralogic/ds3client/metadata/AbstractMetadataRestore.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/main/java/com/spectralogic/ds3client/metadata/MetaDataUtil.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/main/java/com/spectralogic/ds3client/metadata/MetadataKeyConstants.java

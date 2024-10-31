@@ -33,6 +33,9 @@ public class CacheFilesystem {
     @JsonProperty("BurstThreshold")
     private double burstThreshold;
 
+    @JsonProperty("CacheSafetyEnabled")
+    private boolean cacheSafetyEnabled;
+
     @JsonProperty("Id")
     private UUID id;
 
@@ -41,6 +44,9 @@ public class CacheFilesystem {
 
     @JsonProperty("MaxPercentUtilizationOfFilesystem")
     private Double maxPercentUtilizationOfFilesystem;
+
+    @JsonProperty("NeedsReconcile")
+    private boolean needsReconcile;
 
     @JsonProperty("NodeId")
     private UUID nodeId;
@@ -82,6 +88,15 @@ public class CacheFilesystem {
     }
 
 
+    public boolean getCacheSafetyEnabled() {
+        return this.cacheSafetyEnabled;
+    }
+
+    public void setCacheSafetyEnabled(final boolean cacheSafetyEnabled) {
+        this.cacheSafetyEnabled = cacheSafetyEnabled;
+    }
+
+
     public UUID getId() {
         return this.id;
     }
@@ -106,6 +121,15 @@ public class CacheFilesystem {
 
     public void setMaxPercentUtilizationOfFilesystem(final Double maxPercentUtilizationOfFilesystem) {
         this.maxPercentUtilizationOfFilesystem = maxPercentUtilizationOfFilesystem;
+    }
+
+
+    public boolean getNeedsReconcile() {
+        return this.needsReconcile;
+    }
+
+    public void setNeedsReconcile(final boolean needsReconcile) {
+        this.needsReconcile = needsReconcile;
     }
 
 

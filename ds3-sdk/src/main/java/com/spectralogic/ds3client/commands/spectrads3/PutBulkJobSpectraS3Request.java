@@ -19,7 +19,6 @@ package com.spectralogic.ds3client.commands.spectrads3;
 import com.spectralogic.ds3client.BulkCommand;
 import com.spectralogic.ds3client.models.bulk.Ds3Object;
 import com.spectralogic.ds3client.commands.interfaces.BulkRequest;
-import com.google.common.net.UrlEscapers;
 import com.spectralogic.ds3client.models.Priority;
 
 public class PutBulkJobSpectraS3Request extends BulkRequest {
@@ -29,6 +28,8 @@ public class PutBulkJobSpectraS3Request extends BulkRequest {
 
     
     private boolean aggregating;
+
+    private boolean deadJobCleanupAllowed;
 
     private boolean force;
 
@@ -41,6 +42,8 @@ public class PutBulkJobSpectraS3Request extends BulkRequest {
     private String name;
 
     private boolean preAllocateJobSpace;
+
+    private boolean protectedFlag;
 
     private boolean verifyAfterWrite;
 
@@ -56,6 +59,13 @@ public class PutBulkJobSpectraS3Request extends BulkRequest {
     public PutBulkJobSpectraS3Request withAggregating(final boolean aggregating) {
         this.aggregating = aggregating;
         this.updateQueryParam("aggregating", aggregating);
+        return this;
+    }
+
+
+    public PutBulkJobSpectraS3Request withDeadJobCleanupAllowed(final boolean deadJobCleanupAllowed) {
+        this.deadJobCleanupAllowed = deadJobCleanupAllowed;
+        this.updateQueryParam("dead_job_cleanup_allowed", deadJobCleanupAllowed);
         return this;
     }
 
@@ -131,6 +141,13 @@ public class PutBulkJobSpectraS3Request extends BulkRequest {
     }
 
 
+    public PutBulkJobSpectraS3Request withProtected(final boolean protectedFlag) {
+        this.protectedFlag = protectedFlag;
+        this.updateQueryParam("protected", protectedFlag);
+        return this;
+    }
+
+
     public PutBulkJobSpectraS3Request withVerifyAfterWrite(final boolean verifyAfterWrite) {
         this.verifyAfterWrite = verifyAfterWrite;
         this.updateQueryParam("verify_after_write", verifyAfterWrite);
@@ -142,6 +159,11 @@ public class PutBulkJobSpectraS3Request extends BulkRequest {
     
     public boolean getAggregating() {
         return this.aggregating;
+    }
+
+
+    public boolean getDeadJobCleanupAllowed() {
+        return this.deadJobCleanupAllowed;
     }
 
 
@@ -172,6 +194,11 @@ public class PutBulkJobSpectraS3Request extends BulkRequest {
 
     public boolean getPreAllocateJobSpace() {
         return this.preAllocateJobSpace;
+    }
+
+
+    public boolean getProtected() {
+        return this.protectedFlag;
     }
 
 

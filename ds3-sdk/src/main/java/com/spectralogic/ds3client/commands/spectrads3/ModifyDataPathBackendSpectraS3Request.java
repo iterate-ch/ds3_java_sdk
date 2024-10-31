@@ -41,15 +41,23 @@ public class ModifyDataPathBackendSpectraS3Request extends AbstractRequest {
 
     private boolean defaultVerifyDataPriorToImport;
 
+    private double iomCacheLimitationPercent;
+
     private boolean iomEnabled;
 
+    private int maxAggregatedBlobsPerChunk;
+
     private Integer partiallyVerifyLastPercentOfTapes;
+
+    private boolean poolSafetyEnabled;
 
     private UnavailableMediaUsagePolicy unavailableMediaPolicy;
 
     private int unavailablePoolMaxJobRetryInMins;
 
     private int unavailableTapePartitionMaxJobRetryInMins;
+
+    private boolean verifyCheckpointBeforeRead;
 
     // Constructor
     
@@ -107,6 +115,13 @@ public class ModifyDataPathBackendSpectraS3Request extends AbstractRequest {
     }
 
 
+    public ModifyDataPathBackendSpectraS3Request withIomCacheLimitationPercent(final double iomCacheLimitationPercent) {
+        this.iomCacheLimitationPercent = iomCacheLimitationPercent;
+        this.updateQueryParam("iom_cache_limitation_percent", iomCacheLimitationPercent);
+        return this;
+    }
+
+
     public ModifyDataPathBackendSpectraS3Request withIomEnabled(final boolean iomEnabled) {
         this.iomEnabled = iomEnabled;
         this.updateQueryParam("iom_enabled", iomEnabled);
@@ -114,9 +129,23 @@ public class ModifyDataPathBackendSpectraS3Request extends AbstractRequest {
     }
 
 
+    public ModifyDataPathBackendSpectraS3Request withMaxAggregatedBlobsPerChunk(final int maxAggregatedBlobsPerChunk) {
+        this.maxAggregatedBlobsPerChunk = maxAggregatedBlobsPerChunk;
+        this.updateQueryParam("max_aggregated_blobs_per_chunk", maxAggregatedBlobsPerChunk);
+        return this;
+    }
+
+
     public ModifyDataPathBackendSpectraS3Request withPartiallyVerifyLastPercentOfTapes(final Integer partiallyVerifyLastPercentOfTapes) {
         this.partiallyVerifyLastPercentOfTapes = partiallyVerifyLastPercentOfTapes;
         this.updateQueryParam("partially_verify_last_percent_of_tapes", partiallyVerifyLastPercentOfTapes);
+        return this;
+    }
+
+
+    public ModifyDataPathBackendSpectraS3Request withPoolSafetyEnabled(final boolean poolSafetyEnabled) {
+        this.poolSafetyEnabled = poolSafetyEnabled;
+        this.updateQueryParam("pool_safety_enabled", poolSafetyEnabled);
         return this;
     }
 
@@ -138,6 +167,13 @@ public class ModifyDataPathBackendSpectraS3Request extends AbstractRequest {
     public ModifyDataPathBackendSpectraS3Request withUnavailableTapePartitionMaxJobRetryInMins(final int unavailableTapePartitionMaxJobRetryInMins) {
         this.unavailableTapePartitionMaxJobRetryInMins = unavailableTapePartitionMaxJobRetryInMins;
         this.updateQueryParam("unavailable_tape_partition_max_job_retry_in_mins", unavailableTapePartitionMaxJobRetryInMins);
+        return this;
+    }
+
+
+    public ModifyDataPathBackendSpectraS3Request withVerifyCheckpointBeforeRead(final boolean verifyCheckpointBeforeRead) {
+        this.verifyCheckpointBeforeRead = verifyCheckpointBeforeRead;
+        this.updateQueryParam("verify_checkpoint_before_read", verifyCheckpointBeforeRead);
         return this;
     }
 
@@ -188,13 +224,28 @@ public class ModifyDataPathBackendSpectraS3Request extends AbstractRequest {
     }
 
 
+    public double getIomCacheLimitationPercent() {
+        return this.iomCacheLimitationPercent;
+    }
+
+
     public boolean getIomEnabled() {
         return this.iomEnabled;
     }
 
 
+    public int getMaxAggregatedBlobsPerChunk() {
+        return this.maxAggregatedBlobsPerChunk;
+    }
+
+
     public Integer getPartiallyVerifyLastPercentOfTapes() {
         return this.partiallyVerifyLastPercentOfTapes;
+    }
+
+
+    public boolean getPoolSafetyEnabled() {
+        return this.poolSafetyEnabled;
     }
 
 
@@ -210,6 +261,11 @@ public class ModifyDataPathBackendSpectraS3Request extends AbstractRequest {
 
     public int getUnavailableTapePartitionMaxJobRetryInMins() {
         return this.unavailableTapePartitionMaxJobRetryInMins;
+    }
+
+
+    public boolean getVerifyCheckpointBeforeRead() {
+        return this.verifyCheckpointBeforeRead;
     }
 
 }

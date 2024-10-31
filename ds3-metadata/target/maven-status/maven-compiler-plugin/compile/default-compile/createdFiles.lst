@@ -1,0 +1,17 @@
+com/spectralogic/ds3client/metadata/MetadataStoreFactory.class
+com/spectralogic/ds3client/metadata/WindowsMetadataException.class
+com/spectralogic/ds3client/metadata/jna/Advapi32.class
+com/spectralogic/ds3client/metadata/AbstractMetadataRestore$1.class
+com/spectralogic/ds3client/metadata/PosixMetadataStore.class
+com/spectralogic/ds3client/metadata/AbstractMetadataRestore.class
+com/spectralogic/ds3client/metadata/MACMetadataRestore.class
+com/spectralogic/ds3client/metadata/WindowsMetadataRestore.class
+com/spectralogic/ds3client/metadata/WindowsMetadataStore.class
+com/spectralogic/ds3client/metadata/PermissionsUtils.class
+com/spectralogic/ds3client/metadata/MetadataKeyConstants.class
+com/spectralogic/ds3client/metadata/PosixMetadataRestore.class
+com/spectralogic/ds3client/metadata/MetadataReceivedListenerImpl.class
+com/spectralogic/ds3client/metadata/MetadataAccessImpl.class
+com/spectralogic/ds3client/metadata/MetadataRestoreFactory.class
+com/spectralogic/ds3client/metadata/MetaDataUtil.class
+com/spectralogic/ds3client/metadata/AbstractMetadataStore.class

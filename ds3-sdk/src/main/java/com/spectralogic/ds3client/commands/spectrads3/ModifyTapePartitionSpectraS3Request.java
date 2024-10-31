@@ -18,8 +18,8 @@ package com.spectralogic.ds3client.commands.spectrads3;
 
 import com.spectralogic.ds3client.networking.HttpVerb;
 import com.spectralogic.ds3client.commands.interfaces.AbstractRequest;
+import java.lang.Integer;
 import com.spectralogic.ds3client.models.Quiesced;
-import com.google.common.net.UrlEscapers;
 
 public class ModifyTapePartitionSpectraS3Request extends AbstractRequest {
 
@@ -28,6 +28,10 @@ public class ModifyTapePartitionSpectraS3Request extends AbstractRequest {
     private final String tapePartition;
 
     private boolean autoCompactionEnabled;
+
+    private boolean autoQuiesceEnabled;
+
+    private Integer driveIdleTimeoutInMinutes;
 
     private int minimumReadReservedDrives;
 
@@ -48,6 +52,20 @@ public class ModifyTapePartitionSpectraS3Request extends AbstractRequest {
     public ModifyTapePartitionSpectraS3Request withAutoCompactionEnabled(final boolean autoCompactionEnabled) {
         this.autoCompactionEnabled = autoCompactionEnabled;
         this.updateQueryParam("auto_compaction_enabled", autoCompactionEnabled);
+        return this;
+    }
+
+
+    public ModifyTapePartitionSpectraS3Request withAutoQuiesceEnabled(final boolean autoQuiesceEnabled) {
+        this.autoQuiesceEnabled = autoQuiesceEnabled;
+        this.updateQueryParam("auto_quiesce_enabled", autoQuiesceEnabled);
+        return this;
+    }
+
+
+    public ModifyTapePartitionSpectraS3Request withDriveIdleTimeoutInMinutes(final Integer driveIdleTimeoutInMinutes) {
+        this.driveIdleTimeoutInMinutes = driveIdleTimeoutInMinutes;
+        this.updateQueryParam("drive_idle_timeout_in_minutes", driveIdleTimeoutInMinutes);
         return this;
     }
 
@@ -98,6 +116,16 @@ public class ModifyTapePartitionSpectraS3Request extends AbstractRequest {
 
     public boolean getAutoCompactionEnabled() {
         return this.autoCompactionEnabled;
+    }
+
+
+    public boolean getAutoQuiesceEnabled() {
+        return this.autoQuiesceEnabled;
+    }
+
+
+    public Integer getDriveIdleTimeoutInMinutes() {
+        return this.driveIdleTimeoutInMinutes;
     }
 
 

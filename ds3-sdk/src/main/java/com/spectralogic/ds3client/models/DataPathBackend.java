@@ -52,14 +52,23 @@ public class DataPathBackend {
     @JsonProperty("InstanceId")
     private UUID instanceId;
 
+    @JsonProperty("IomCacheLimitationPercent")
+    private double iomCacheLimitationPercent;
+
     @JsonProperty("IomEnabled")
     private boolean iomEnabled;
 
     @JsonProperty("LastHeartbeat")
     private Date lastHeartbeat;
 
+    @JsonProperty("MaxAggregatedBlobsPerChunk")
+    private int maxAggregatedBlobsPerChunk;
+
     @JsonProperty("PartiallyVerifyLastPercentOfTapes")
     private Integer partiallyVerifyLastPercentOfTapes;
+
+    @JsonProperty("PoolSafetyEnabled")
+    private boolean poolSafetyEnabled;
 
     @JsonProperty("UnavailableMediaPolicy")
     private UnavailableMediaUsagePolicy unavailableMediaPolicy;
@@ -69,6 +78,9 @@ public class DataPathBackend {
 
     @JsonProperty("UnavailableTapePartitionMaxJobRetryInMins")
     private int unavailableTapePartitionMaxJobRetryInMins;
+
+    @JsonProperty("VerifyCheckpointBeforeRead")
+    private boolean verifyCheckpointBeforeRead;
 
     // Constructor
     public DataPathBackend() {
@@ -158,6 +170,15 @@ public class DataPathBackend {
     }
 
 
+    public double getIomCacheLimitationPercent() {
+        return this.iomCacheLimitationPercent;
+    }
+
+    public void setIomCacheLimitationPercent(final double iomCacheLimitationPercent) {
+        this.iomCacheLimitationPercent = iomCacheLimitationPercent;
+    }
+
+
     public boolean getIomEnabled() {
         return this.iomEnabled;
     }
@@ -176,12 +197,30 @@ public class DataPathBackend {
     }
 
 
+    public int getMaxAggregatedBlobsPerChunk() {
+        return this.maxAggregatedBlobsPerChunk;
+    }
+
+    public void setMaxAggregatedBlobsPerChunk(final int maxAggregatedBlobsPerChunk) {
+        this.maxAggregatedBlobsPerChunk = maxAggregatedBlobsPerChunk;
+    }
+
+
     public Integer getPartiallyVerifyLastPercentOfTapes() {
         return this.partiallyVerifyLastPercentOfTapes;
     }
 
     public void setPartiallyVerifyLastPercentOfTapes(final Integer partiallyVerifyLastPercentOfTapes) {
         this.partiallyVerifyLastPercentOfTapes = partiallyVerifyLastPercentOfTapes;
+    }
+
+
+    public boolean getPoolSafetyEnabled() {
+        return this.poolSafetyEnabled;
+    }
+
+    public void setPoolSafetyEnabled(final boolean poolSafetyEnabled) {
+        this.poolSafetyEnabled = poolSafetyEnabled;
     }
 
 
@@ -209,6 +248,15 @@ public class DataPathBackend {
 
     public void setUnavailableTapePartitionMaxJobRetryInMins(final int unavailableTapePartitionMaxJobRetryInMins) {
         this.unavailableTapePartitionMaxJobRetryInMins = unavailableTapePartitionMaxJobRetryInMins;
+    }
+
+
+    public boolean getVerifyCheckpointBeforeRead() {
+        return this.verifyCheckpointBeforeRead;
+    }
+
+    public void setVerifyCheckpointBeforeRead(final boolean verifyCheckpointBeforeRead) {
+        this.verifyCheckpointBeforeRead = verifyCheckpointBeforeRead;
     }
 
 }

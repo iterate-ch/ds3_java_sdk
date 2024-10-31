@@ -1,0 +1,17 @@
+com/spectralogic/ds3client/metadata/MetadataAccessImpl_Test$1.class
+com/spectralogic/ds3client/metadata/MetadataAccessImpl_Test.class
+com/spectralogic/ds3client/metadata/PosixMetadataRestore_Test$1.class
+com/spectralogic/ds3client/metadata/MetadataAccessImpl_Test$2.class
+com/spectralogic/ds3client/MockedHeaders.class
+com/spectralogic/ds3client/metadata/WindowsMetadataStore_Test.class
+com/spectralogic/ds3client/metadata/MetadataReceivedListenerImpl_Test$1.class
+com/spectralogic/ds3client/metadata/MetadataRestoreFactory_Test.class
+com/spectralogic/ds3client/metadata/MetadataReceivedListenerImpl_Test$2.class
+com/spectralogic/ds3client/metadata/PosixMetadataStore_Test.class
+com/spectralogic/ds3client/metadata/MetadataReceivedListenerImpl_Test.class
+com/spectralogic/ds3client/metadata/MACMetadataRestore_Test$1.class
+com/spectralogic/ds3client/metadata/MACMetadataRestore_Test.class
+com/spectralogic/ds3client/MockedHeadersReturningKeys.class
+com/spectralogic/ds3client/metadata/PosixMetadataRestore_Test.class
+com/spectralogic/ds3client/metadata/WindowsMetadataRestore_Test.class
+com/spectralogic/ds3client/metadata/WindowsMetadataRestore_Test$1.class

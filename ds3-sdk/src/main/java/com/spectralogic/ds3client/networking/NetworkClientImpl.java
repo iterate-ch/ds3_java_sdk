@@ -125,9 +125,9 @@ public class NetworkClientImpl implements NetworkClient {
 
     private static CloseableHttpClient createInsecureSslHttpClient() throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
         final SSLContext sslContext = new SSLContextBuilder()
-                .useProtocol(INSECURE_SSL_PROTOCOL)
+                .setProtocol(INSECURE_SSL_PROTOCOL)
                 .loadTrustMaterial(null, (TrustStrategy) (chain, authType) -> true).build();
-        final SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier());
+        final SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext, new String[]{ INSECURE_SSL_PROTOCOL }, null, new NoopHostnameVerifier());
 
         final Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
                 .register("http", PlainConnectionSocketFactory.getSocketFactory())

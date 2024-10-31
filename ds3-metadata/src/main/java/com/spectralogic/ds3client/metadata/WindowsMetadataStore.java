@@ -16,8 +16,8 @@
 package com.spectralogic.ds3client.metadata;
 
 import com.google.common.collect.ImmutableMap;
-import com.spectralogic.ds3client.metadata.jna.Advapi32;
 import com.spectralogic.ds3client.utils.Guard;
+import com.sun.jna.platform.win32.Advapi32;
 import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.ptr.PointerByReference;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.AclEntry;
@@ -65,7 +65,7 @@ class WindowsMetadataStore extends AbstractMetadataStore {
         final PointerByReference ppSecurityDescriptor = new PointerByReference();
         final File file = path.toFile();
 
-    final int winApiResult = Advapi32.INSTANCE.GetNamedSecurityInfo(
+        final int winApiResult = Advapi32.INSTANCE.GetNamedSecurityInfo(
                 file.getAbsolutePath(),
                 1,
                 infoType,
@@ -95,7 +95,7 @@ class WindowsMetadataStore extends AbstractMetadataStore {
      * @param acl acl got from jna
      * @return dacl string
      */
-    private String getDaclString(final WinNT.ACL acl) {
+    private static String getDaclString(final WinNT.ACL acl) {
         final WinNT.ACCESS_ACEStructure[] aceStructures = acl.getACEStructures();
         final StringBuilder daclStringBuffer = new StringBuilder();
         for (final WinNT.ACCESS_ACEStructure aceStructure : aceStructures) {
@@ -123,31 +123,31 @@ class WindowsMetadataStore extends AbstractMetadataStore {
     private String saveFlagMetaData(final Path file) throws IOException {
         final StringBuilder flagBuilder = new StringBuilder();
 
-            final ProcessBuilder processBuilder = new ProcessBuilder("attrib", file.toString());
-            final Process process = processBuilder.start();
-            try (final BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.forName("UTF-8")))) {
-                final String flagWindows = reader.readLine();
-                if (Guard.isStringNullOrEmpty(flagWindows)) {
-                    LOG.error("The flagWindows string was null");
-                } else {
-                    final String[] flags = flagWindows.split(" ");
-                    for (int i = 0; i < flags.length - 1; i++) {
-                        final String flag = flags[i];
-                        if (!flag.isEmpty()) {
-                            if (flag.contains("\\")) {
-                                break;
-                            } else {
-                                flagBuilder.append(flag.trim());
-                            }
+        final ProcessBuilder processBuilder = new ProcessBuilder("attrib", file.toString());
+        final Process process = processBuilder.start();
+        try (final BufferedReader reader =
+                     new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
+            final String flagWindows = reader.readLine();
+            if (Guard.isStringNullOrEmpty(flagWindows)) {
+                LOG.error("The flagWindows string was null");
+            } else {
+                final String[] flags = flagWindows.split(" ");
+                for (int i = 0; i < flags.length - 1; i++) {
+                    final String flag = flags[i];
+                    if (!flag.isEmpty()) {
+                        if (flag.contains("\\")) {
+                            break;
+                        } else {
+                            flagBuilder.append(flag.trim());
                         }
                     }
-                    if (flagBuilder.toString().equals("")) {
-                        flagBuilder.append("N");
-                    }
-                    metadataMap.put(METADATA_PREFIX + KEY_FLAGS, flagBuilder.toString());
                 }
+                if (flagBuilder.toString().equals("")) {
+                    flagBuilder.append("N");
+                }
+                metadataMap.put(METADATA_PREFIX + KEY_FLAGS, flagBuilder.toString());
             }
+        }
         return flagBuilder.toString();
     }
 
@@ -158,68 +158,68 @@ class WindowsMetadataStore extends AbstractMetadataStore {
      */
     private void saveWindowsfilePermissions(final Path file) throws IOException {
 
-            Set<AclEntryPermission> aclEntryPermissions;
-            String userType;
-            String userDisplay;
-            StringBuilder permission;
-            final AclFileAttributeView view = Files.getFileAttributeView(file, AclFileAttributeView.class);
-            final List<AclEntry> aclEntries = view.getAcl();
-            final StringBuilder userList = new StringBuilder();
-            final StringBuilder userDisplayList = new StringBuilder();
-            final Map<String, Set<Integer>> stringSetMap = new HashMap<>();
-            for (final AclEntry aclEntry : aclEntries) {
+        Set<AclEntryPermission> aclEntryPermissions;
+        String userType;
+        String userDisplay;
+        StringBuilder permission;
+        final AclFileAttributeView view = Files.getFileAttributeView(file, AclFileAttributeView.class);
+        final List<AclEntry> aclEntries = view.getAcl();
+        final StringBuilder userList = new StringBuilder();
+        final StringBuilder userDisplayList = new StringBuilder();
+        final Map<String, Set<Integer>> stringSetMap = new HashMap<>();
+        for (final AclEntry aclEntry : aclEntries) {
                 /*
                 If a file has no Windoze dacl entries, as may happen on a network-mounted file system, there won't be a principal entry.
                 A principal is a combination of security provider, like NT AUTHORITY, and user name, e.g. NT AUTHORITY\Gracie.
                 This code is looking for the user name -- the second half of the principal. With no principal, there is no
                 second half of the principal.
                  */
-                final String[] principalFields = aclEntry.principal().getName().split("\\\\");
+            final String[] principalFields = aclEntry.principal().getName().split("\\\\");
 
-                if (principalFields.length < 2) {
-                    continue;
-                }
-
-                userDisplay = principalFields[1];
-
-                Set<Integer> newSet = stringSetMap.get(userDisplay);
-                aclEntryPermissions = aclEntry.permissions();
-                if (newSet == null) {
-                    newSet = new HashSet<>();
-                }
-                for (final AclEntryPermission aclEntryPermission : aclEntryPermissions) {
-                    newSet.add(aclEntryPermission.ordinal());
-                }
-                stringSetMap.put(userDisplay, newSet);
+            if (principalFields.length < 2) {
+                continue;
             }
-            final int setSize = stringSetMap.size();
-            int userCount = 1;
-            for (final Map.Entry<String, Set<Integer>> entry: stringSetMap.entrySet()) {
-                int index = 1;
-                final Set<Integer> ordinals = entry.getValue();
-                final String key = entry.getKey();
-                userType = key.replaceAll(" ", "").toLowerCase();
-                permission = new StringBuilder();
-                for (final int ord : ordinals) {
-                    if (ordinals.size() == index) {
-                        permission.append(ord);
-                    } else {
-                        permission.append(ord).append("-");
-                    }
-                    index++;
-                }
-                if (setSize == userCount) {
-                    userDisplayList.append(key);
-                    userList.append(userType);
+
+            userDisplay = principalFields[1];
+
+            Set<Integer> newSet = stringSetMap.get(userDisplay);
+            aclEntryPermissions = aclEntry.permissions();
+            if (newSet == null) {
+                newSet = new HashSet<>();
+            }
+            for (final AclEntryPermission aclEntryPermission : aclEntryPermissions) {
+                newSet.add(aclEntryPermission.ordinal());
+            }
+            stringSetMap.put(userDisplay, newSet);
+        }
+        final int setSize = stringSetMap.size();
+        int userCount = 1;
+        for (final Map.Entry<String, Set<Integer>> entry : stringSetMap.entrySet()) {
+            int index = 1;
+            final Set<Integer> ordinals = entry.getValue();
+            final String key = entry.getKey();
+            userType = key.replaceAll(" ", "").toLowerCase();
+            permission = new StringBuilder();
+            for (final int ord : ordinals) {
+                if (ordinals.size() == index) {
+                    permission.append(ord);
                 } else {
-                    userDisplayList.append(key).append("-");
-                    userList.append(userType).append("-");
+                    permission.append(ord).append("-");
                 }
-                metadataMap.put("x-amz-meta-ds3-" + userType, permission.toString());
-                userCount++;
+                index++;
             }
-            metadataMap.put("x-amz-meta-ds3-userList", userList.toString());
-            metadataMap.put("x-amz-meta-ds3-userListDisplay", userDisplayList.toString());
+            if (setSize == userCount) {
+                userDisplayList.append(key);
+                userList.append(userType);
+            } else {
+                userDisplayList.append(key).append("-");
+                userList.append(userType).append("-");
+            }
+            metadataMap.put("x-amz-meta-ds3-" + userType, permission.toString());
+            userCount++;
+        }
+        metadataMap.put("x-amz-meta-ds3-userList", userList.toString());
+        metadataMap.put("x-amz-meta-ds3-userListDisplay", userDisplayList.toString());
     }
 
     @Override

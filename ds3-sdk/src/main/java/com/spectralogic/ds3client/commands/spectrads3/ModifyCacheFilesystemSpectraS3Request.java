@@ -19,7 +19,6 @@ package com.spectralogic.ds3client.commands.spectrads3;
 import com.spectralogic.ds3client.networking.HttpVerb;
 import com.spectralogic.ds3client.commands.interfaces.AbstractRequest;
 import java.lang.Long;
-import com.google.common.net.UrlEscapers;
 
 public class ModifyCacheFilesystemSpectraS3Request extends AbstractRequest {
 
@@ -33,7 +32,11 @@ public class ModifyCacheFilesystemSpectraS3Request extends AbstractRequest {
 
     private double burstThreshold;
 
+    private boolean cacheSafetyEnabled;
+
     private Long maxCapacityInBytes;
+
+    private boolean needsReconcile;
 
     // Constructor
     
@@ -64,9 +67,23 @@ public class ModifyCacheFilesystemSpectraS3Request extends AbstractRequest {
     }
 
 
+    public ModifyCacheFilesystemSpectraS3Request withCacheSafetyEnabled(final boolean cacheSafetyEnabled) {
+        this.cacheSafetyEnabled = cacheSafetyEnabled;
+        this.updateQueryParam("cache_safety_enabled", cacheSafetyEnabled);
+        return this;
+    }
+
+
     public ModifyCacheFilesystemSpectraS3Request withMaxCapacityInBytes(final Long maxCapacityInBytes) {
         this.maxCapacityInBytes = maxCapacityInBytes;
         this.updateQueryParam("max_capacity_in_bytes", maxCapacityInBytes);
+        return this;
+    }
+
+
+    public ModifyCacheFilesystemSpectraS3Request withNeedsReconcile(final boolean needsReconcile) {
+        this.needsReconcile = needsReconcile;
+        this.updateQueryParam("needs_reconcile", needsReconcile);
         return this;
     }
 
@@ -102,8 +119,18 @@ public class ModifyCacheFilesystemSpectraS3Request extends AbstractRequest {
     }
 
 
+    public boolean getCacheSafetyEnabled() {
+        return this.cacheSafetyEnabled;
+    }
+
+
     public Long getMaxCapacityInBytes() {
         return this.maxCapacityInBytes;
+    }
+
+
+    public boolean getNeedsReconcile() {
+        return this.needsReconcile;
     }
 
 }

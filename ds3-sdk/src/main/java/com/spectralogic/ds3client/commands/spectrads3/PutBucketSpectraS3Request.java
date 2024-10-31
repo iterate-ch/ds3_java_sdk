@@ -18,7 +18,6 @@ package com.spectralogic.ds3client.commands.spectrads3;
 
 import com.spectralogic.ds3client.networking.HttpVerb;
 import com.spectralogic.ds3client.commands.interfaces.AbstractRequest;
-import com.google.common.net.UrlEscapers;
 import java.util.UUID;
 
 public class PutBucketSpectraS3Request extends AbstractRequest {
@@ -30,6 +29,8 @@ public class PutBucketSpectraS3Request extends AbstractRequest {
     private String dataPolicyId;
 
     private String id;
+
+    private boolean protectedFlag;
 
     private String userId;
 
@@ -71,6 +72,13 @@ public class PutBucketSpectraS3Request extends AbstractRequest {
     }
 
 
+    public PutBucketSpectraS3Request withProtected(final boolean protectedFlag) {
+        this.protectedFlag = protectedFlag;
+        this.updateQueryParam("protected", protectedFlag);
+        return this;
+    }
+
+
     public PutBucketSpectraS3Request withUserId(final UUID userId) {
         this.userId = userId.toString();
         this.updateQueryParam("user_id", userId);
@@ -108,6 +116,11 @@ public class PutBucketSpectraS3Request extends AbstractRequest {
 
     public String getId() {
         return this.id;
+    }
+
+
+    public boolean getProtected() {
+        return this.protectedFlag;
     }
 
 

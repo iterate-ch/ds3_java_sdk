@@ -16,9 +16,9 @@
 package com.spectralogic.ds3client.metadata;
 
 import com.google.common.collect.ImmutableList;
-import com.spectralogic.ds3client.metadata.jna.Advapi32;
 import com.spectralogic.ds3client.networking.Metadata;
 import com.spectralogic.ds3client.utils.Guard;
+import com.sun.jna.platform.win32.Advapi32;
 import com.sun.jna.platform.win32.WinNT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,7 +128,7 @@ class WindowsMetadataRestore extends AbstractMetadataRestore {
      * @return map
      */
 
-    private Map<String,AclEntryPermission> defaultOrdinalPermission(){
+    private static Map<String,AclEntryPermission> defaultOrdinalPermission(){
         final Map<String,AclEntryPermission> defaultOrdinalMap = new HashMap<>();
         defaultOrdinalMap.put("0",AclEntryPermission.READ_DATA);
         defaultOrdinalMap.put("1",AclEntryPermission.WRITE_DATA);
@@ -147,9 +147,9 @@ class WindowsMetadataRestore extends AbstractMetadataRestore {
         return  defaultOrdinalMap;
     }
 
-    private void restorePermissionByUser(final String permission,
-                                         final String user,
-                                         final ImmutableList.Builder<AclEntry> aclEntryBuilder)
+    private static void restorePermissionByUser(final String permission,
+            final String user,
+            final ImmutableList.Builder<AclEntry> aclEntryBuilder)
         throws IOException
     {
         final AclEntry.Builder builderWindow = AclEntry.newBuilder();

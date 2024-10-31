@@ -19,7 +19,6 @@ package com.spectralogic.ds3client.commands.spectrads3;
 import com.spectralogic.ds3client.networking.HttpVerb;
 import com.spectralogic.ds3client.commands.interfaces.AbstractRequest;
 import java.util.Date;
-import com.google.common.net.UrlEscapers;
 import com.spectralogic.ds3client.models.Priority;
 import java.util.UUID;
 
@@ -31,9 +30,13 @@ public class ModifyJobSpectraS3Request extends AbstractRequest {
 
     private Date createdAt;
 
+    private boolean deadJobCleanupAllowed;
+
     private String name;
 
     private Priority priority;
+
+    private boolean protectedFlag;
 
     // Constructor
     
@@ -56,6 +59,13 @@ public class ModifyJobSpectraS3Request extends AbstractRequest {
     }
 
 
+    public ModifyJobSpectraS3Request withDeadJobCleanupAllowed(final boolean deadJobCleanupAllowed) {
+        this.deadJobCleanupAllowed = deadJobCleanupAllowed;
+        this.updateQueryParam("dead_job_cleanup_allowed", deadJobCleanupAllowed);
+        return this;
+    }
+
+
     public ModifyJobSpectraS3Request withName(final String name) {
         this.name = name;
         this.updateQueryParam("name", name);
@@ -66,6 +76,13 @@ public class ModifyJobSpectraS3Request extends AbstractRequest {
     public ModifyJobSpectraS3Request withPriority(final Priority priority) {
         this.priority = priority;
         this.updateQueryParam("priority", priority);
+        return this;
+    }
+
+
+    public ModifyJobSpectraS3Request withProtected(final boolean protectedFlag) {
+        this.protectedFlag = protectedFlag;
+        this.updateQueryParam("protected", protectedFlag);
         return this;
     }
 
@@ -91,6 +108,11 @@ public class ModifyJobSpectraS3Request extends AbstractRequest {
     }
 
 
+    public boolean getDeadJobCleanupAllowed() {
+        return this.deadJobCleanupAllowed;
+    }
+
+
     public String getName() {
         return this.name;
     }
@@ -98,6 +120,11 @@ public class ModifyJobSpectraS3Request extends AbstractRequest {
 
     public Priority getPriority() {
         return this.priority;
+    }
+
+
+    public boolean getProtected() {
+        return this.protectedFlag;
     }
 
 }

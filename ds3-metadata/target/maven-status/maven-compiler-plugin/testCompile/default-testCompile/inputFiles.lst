@@ -1,0 +1,10 @@
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/test/java/com/spectralogic/ds3client/metadata/MetadataAccessImpl_Test.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/test/java/com/spectralogic/ds3client/MockedHeadersReturningKeys.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/test/java/com/spectralogic/ds3client/metadata/PosixMetadataStore_Test.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/test/java/com/spectralogic/ds3client/metadata/WindowsMetadataRestore_Test.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/test/java/com/spectralogic/ds3client/MockedHeaders.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/test/java/com/spectralogic/ds3client/metadata/MACMetadataRestore_Test.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/test/java/com/spectralogic/ds3client/metadata/MetadataReceivedListenerImpl_Test.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/test/java/com/spectralogic/ds3client/metadata/MetadataRestoreFactory_Test.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/test/java/com/spectralogic/ds3client/metadata/PosixMetadataRestore_Test.java
+/Users/dkocher/Projects/ds3_java_sdk/ds3-metadata/src/test/java/com/spectralogic/ds3client/metadata/WindowsMetadataStore_Test.java

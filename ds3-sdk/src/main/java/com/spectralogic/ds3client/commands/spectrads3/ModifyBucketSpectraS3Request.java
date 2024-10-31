@@ -19,7 +19,6 @@ package com.spectralogic.ds3client.commands.spectrads3;
 import com.spectralogic.ds3client.networking.HttpVerb;
 import com.spectralogic.ds3client.commands.interfaces.AbstractRequest;
 import java.util.UUID;
-import com.google.common.net.UrlEscapers;
 
 public class ModifyBucketSpectraS3Request extends AbstractRequest {
 
@@ -28,6 +27,8 @@ public class ModifyBucketSpectraS3Request extends AbstractRequest {
     private final String bucketName;
 
     private String dataPolicyId;
+
+    private boolean protectedFlag;
 
     private String userId;
 
@@ -49,6 +50,13 @@ public class ModifyBucketSpectraS3Request extends AbstractRequest {
     public ModifyBucketSpectraS3Request withDataPolicyId(final String dataPolicyId) {
         this.dataPolicyId = dataPolicyId;
         this.updateQueryParam("data_policy_id", dataPolicyId);
+        return this;
+    }
+
+
+    public ModifyBucketSpectraS3Request withProtected(final boolean protectedFlag) {
+        this.protectedFlag = protectedFlag;
+        this.updateQueryParam("protected", protectedFlag);
         return this;
     }
 
@@ -85,6 +93,11 @@ public class ModifyBucketSpectraS3Request extends AbstractRequest {
 
     public String getDataPolicyId() {
         return this.dataPolicyId;
+    }
+
+
+    public boolean getProtected() {
+        return this.protectedFlag;
     }
 
 

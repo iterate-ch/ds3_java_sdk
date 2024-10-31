@@ -795,6 +795,12 @@ public interface Ds3Client extends Closeable {
     VerifyBulkJobSpectraS3Response verifyBulkJobSpectraS3(final VerifyBulkJobSpectraS3Request request)
             throws IOException;
 
+    @Action("DELETE")
+    @Resource("JOB_CREATION_FAILED")
+    
+    DeleteJobCreationFailureSpectraS3Response deleteJobCreationFailureSpectraS3(final DeleteJobCreationFailureSpectraS3Request request)
+            throws IOException;
+
     @ResponsePayloadModel("ActiveJob")
     @Action("SHOW")
     @Resource("ACTIVE_JOB")
@@ -856,6 +862,13 @@ public interface Ds3Client extends Closeable {
     @Resource("JOB_CHUNK")
     
     GetJobChunksReadyForClientProcessingSpectraS3Response getJobChunksReadyForClientProcessingSpectraS3(final GetJobChunksReadyForClientProcessingSpectraS3Request request)
+            throws IOException;
+
+    @ResponsePayloadModel("JobCreationFailedList")
+    @Action("LIST")
+    @Resource("JOB_CREATION_FAILED")
+    
+    GetJobCreationFailuresSpectraS3Response getJobCreationFailuresSpectraS3(final GetJobCreationFailuresSpectraS3Request request)
             throws IOException;
 
     @ResponsePayloadModel("MasterObjectList")
@@ -1807,6 +1820,13 @@ public interface Ds3Client extends Closeable {
     CancelOnlineTapeSpectraS3Response cancelOnlineTapeSpectraS3(final CancelOnlineTapeSpectraS3Request request)
             throws IOException;
 
+    @ResponsePayloadModel("TapeDrive")
+    @Action("MODIFY")
+    @Resource("TAPE_DRIVE")
+    
+    CancelTestTapeDriveSpectraS3Response cancelTestTapeDriveSpectraS3(final CancelTestTapeDriveSpectraS3Request request)
+            throws IOException;
+
     @ResponsePayloadModel("TapeFailureList")
     @Action("BULK_MODIFY")
     @Resource("TAPE")
@@ -1826,6 +1846,13 @@ public interface Ds3Client extends Closeable {
     @Resource("TAPE_DRIVE")
     
     CleanTapeDriveSpectraS3Response cleanTapeDriveSpectraS3(final CleanTapeDriveSpectraS3Request request)
+            throws IOException;
+
+    @ResponsePayloadModel("TapeDrive")
+    @Action("MODIFY")
+    @Resource("TAPE_DRIVE")
+    
+    PutDriveDumpSpectraS3Response putDriveDumpSpectraS3(final PutDriveDumpSpectraS3Request request)
             throws IOException;
 
     @ResponsePayloadModel("TapeDensityDirective")
@@ -2050,6 +2077,13 @@ public interface Ds3Client extends Closeable {
     InspectTapeSpectraS3Response inspectTapeSpectraS3(final InspectTapeSpectraS3Request request)
             throws IOException;
 
+    @ResponsePayloadModel("Tape")
+    @Action("MODIFY")
+    @Resource("TAPE")
+    
+    MarkTapeForCompactionSpectraS3Response markTapeForCompactionSpectraS3(final MarkTapeForCompactionSpectraS3Request request)
+            throws IOException;
+
     @Action("BULK_MODIFY")
     @Resource("TAPE_PARTITION")
     
@@ -2102,6 +2136,13 @@ public interface Ds3Client extends Closeable {
     @Resource("TAPE")
     
     RawImportTapeSpectraS3Response rawImportTapeSpectraS3(final RawImportTapeSpectraS3Request request)
+            throws IOException;
+
+    @ResponsePayloadModel("TapeDrive")
+    @Action("MODIFY")
+    @Resource("TAPE_DRIVE")
+    
+    TestTapeDriveSpectraS3Response testTapeDriveSpectraS3(final TestTapeDriveSpectraS3Request request)
             throws IOException;
 
     @ResponsePayloadModel("TapeFailureList")

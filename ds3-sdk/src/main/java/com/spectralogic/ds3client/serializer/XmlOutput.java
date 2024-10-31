@@ -1,6 +1,6 @@
 /*
  * ******************************************************************************
- *   Copyright 2014-2019 Spectra Logic Corporation. All Rights Reserved.
+ *   Copyright 2014-2022 Spectra Logic Corporation. All Rights Reserved.
  *   Licensed under the Apache License, Version 2.0 (the "License"). You may not use
  *   this file except in compliance with the License. A copy of the License is located at
  *
@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.deser.FromXmlParser;
 import com.spectralogic.ds3client.models.bulk.Ds3ObjectList;
 
 import java.io.IOException;
@@ -33,6 +34,10 @@ public final class XmlOutput {
         final JacksonXmlModule module = new JacksonXmlModule();
         module.setDefaultUseWrapper(false);
         mapper = new XmlMapper(module);
+        // we must treat <tag/> as having nil value - see discussion at
+        // https://github.com/SpectraLogic/ds3_java_sdk/pull/595
+        mapper.configure(FromXmlParser.Feature.EMPTY_ELEMENT_AS_NULL, true);
+
         final SimpleFilterProvider filterProvider = new SimpleFilterProvider().setFailOnUnknownId(false);
         mapper.setFilterProvider(filterProvider);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -46,12 +51,10 @@ public final class XmlOutput {
         try {
             if (view == null) {
                 return mapper.writeValueAsString(object);
-            }
-            else {
+            } else {
                 return mapper.writerWithView(view).writeValueAsString(object);
             }
-        }
-        catch(final JsonProcessingException e) {
+        } catch (final JsonProcessingException e) {
             throw new XmlProcessingException(e);
         }
     }
@@ -63,11 +66,11 @@ public final class XmlOutput {
         return XmlOutput.toXml(objects, Views.GetObject.class);
     }
 
-    public static<T> T fromXml(final String xmlString, final Class<T> type) throws IOException {
+    public static <T> T fromXml(final String xmlString, final Class<T> type) throws IOException {
         return mapper.readValue(xmlString, type);
     }
 
-    public static<T> T fromXml(final InputStream stream, final Class<T> type) throws IOException {
+    public static <T> T fromXml(final InputStream stream, final Class<T> type) throws IOException {
         return mapper.readValue(stream, type);
     }
 }
